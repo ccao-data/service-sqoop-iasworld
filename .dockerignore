@@ -4,3 +4,4 @@ secrets/
 .git/
 .gitlab-ci.yml
 .dockerignore
+target/
