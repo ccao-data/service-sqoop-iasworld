@@ -5,9 +5,10 @@ services:
     image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
     container_name: sqoop
     volumes:
-      - ${PWD}/ojdbc8-full:/jdbc
-      - ${PWD}/target:/tmp/target
-      - ${PWD}/scripts:/scripts
+      - drivers:/jdbc
+      - target:/tmp/target
+      - scripts:/scripts
+      - jobs:/home/root/.sqoop/jobs
     environment:
       - IPTS_HOSTNAME
       - IPTS_PORT

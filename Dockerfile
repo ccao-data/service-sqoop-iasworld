@@ -22,7 +22,7 @@ RUN curl http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm >
 
 # Maven
 ARG MAVEN_VER=3.5.3
-RUN curl https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VER}/apache-maven-${MAVEN_VER}-bin.tar.gz | tar xz  -C /usr/share
+RUN curl https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VER}/apache-maven-${MAVEN_VER}-bin.tar.gz | tar xz -C /usr/share
 ENV MAVEN_HOME /usr/share/apache-maven-${MAVEN_VER}
 ENV PATH $PATH:$MAVEN_HOME/bin
 
