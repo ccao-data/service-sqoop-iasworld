@@ -118,7 +118,7 @@ COPY site/ ${HADOOP_HOME}/etc/hadoop/
 RUN sed s/HOSTNAME/localhost/ ${HADOOP_HOME}/etc/hadoop/core-site.xml.template > ${HADOOP_HOME}/etc/hadoop/core-site.xml
 
 # Add docker startup files and dirs
-COPY docker-startup/ /etc/docker-startup/
+COPY docker-startup/init.sh /etc/docker-startup/init.sh
 RUN /etc/docker-startup/init.sh
 
 
@@ -137,6 +137,11 @@ ENV PATH $PATH:$HADOOP_HOME/bin:$SQOOP_HOME/bin
 RUN curl -s http://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER}.tar.gz | tar -xz -C /usr/local && \
     ln -s /usr/local/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER} ${SQOOP_HOME}
 
+# Make dirs for class files and jars
+RUN mkdir -p /tmp/bindir /tmp/target && \
+    chmod +x ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
+    chown root:root ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh 
+
 # Entrypoint/startup for sqoop
-COPY entrypoint.sh /etc/entrypoint.sh
-CMD ["/etc/entrypoint.sh"]
+COPY docker-startup/bootstrap.sh docker-startup/entrypoint.sh /etc/docker-startup/
+ENTRYPOINT ["/etc/docker-startup/entrypoint.sh"]

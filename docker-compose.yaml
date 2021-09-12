@@ -1,0 +1,21 @@
+version: '3.6'
+services:
+  sqoop:
+    build: .
+    image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
+    container_name: sqoop
+    volumes:
+      - ${PWD}/ojdbc8-full:/jdbc
+      - ${PWD}/target:/tmp/target
+      - ${PWD}/scripts:/scripts
+    environment:
+      - IPTS_HOSTNAME
+      - IPTS_PORT
+      - IPTS_SERVICE_NAME
+      - IPTS_USERNAME
+    secrets:
+      - IPTS_PASSWORD
+
+secrets:
+  IPTS_PASSWORD:
+    file: secrets/IPTS_PASSWORD
