@@ -1,4 +1,4 @@
-sqoop import -fs file:/// -jt local \
+sqoop job --create ${IPTS_TABLE} -- import -fs file:/// -jt local \
     -libjars /tmp/bindir/ \
     --bindir /tmp/bindir/ \
     --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \

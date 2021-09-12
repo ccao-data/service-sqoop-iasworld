@@ -1,7 +1,8 @@
 .env
-ojdbc8-full/
-secrets/
-.git/
 .gitlab-ci.yml
 .dockerignore
+.git/
+drivers/
+secrets/
 target/
+jobs/
