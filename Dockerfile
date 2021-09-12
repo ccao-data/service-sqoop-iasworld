@@ -82,7 +82,7 @@ RUN curl -sk https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VER}/
     mv /tmp/native /usr/local/hadoop/lib
 
 # ssh setup for node comms
-COPY ssh/config /root/.ssh/config
+COPY docker-config/ssh_config /root/.ssh/config
 RUN chmod 600 /root/.ssh/config && \
     chown root:root /root/.ssh/config && \
     ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key && \
@@ -114,12 +114,12 @@ RUN echo "JAVA_HOME=${JAVA_HOME}" >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && 
 # Make pseudo-distributed
 RUN mkdir ${HADOOP_HOME}/input && \
     cp ${HADOOP_HOME}/etc/hadoop/*.xml ${HADOOP_HOME}/input
-COPY site/ ${HADOOP_HOME}/etc/hadoop/
+COPY docker-config/site/ ${HADOOP_HOME}/etc/hadoop/
 RUN sed s/HOSTNAME/localhost/ ${HADOOP_HOME}/etc/hadoop/core-site.xml.template > ${HADOOP_HOME}/etc/hadoop/core-site.xml
 
 # Add docker startup files and dirs
-COPY docker-startup/init.sh /etc/docker-startup/init.sh
-RUN /etc/docker-startup/init.sh
+COPY docker-config/init.sh /etc/docker-config/init.sh
+RUN /etc/docker-config/init.sh
 
 
 ##### CREATE MAIN SQOOP IMAGE #####
@@ -143,5 +143,6 @@ RUN mkdir -p /tmp/bindir /tmp/target && \
     chown root:root ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh 
 
 # Entrypoint/startup for sqoop
-COPY docker-startup/bootstrap.sh docker-startup/entrypoint.sh /etc/docker-startup/
-ENTRYPOINT ["/etc/docker-startup/entrypoint.sh"]
+COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 
+COPY docker-config/bootstrap.sh docker-config/entrypoint.sh /etc/docker-config/
+ENTRYPOINT ["/etc/docker-config/entrypoint.sh"]

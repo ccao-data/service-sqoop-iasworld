@@ -2,13 +2,13 @@ version: '3.6'
 services:
   sqoop:
     build: .
-    image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
+    image: sqoop:latest 
     container_name: sqoop
     volumes:
-      - drivers:/jdbc
-      - target:/tmp/target
-      - scripts:/scripts
-      - jobs:/home/root/.sqoop/jobs
+      - ./drivers:/jdbc
+      - ./scripts:/scripts
+      - ./target:/tmp/target
+      - ./target/metastore:/root/.sqoop
     environment:
       - IPTS_HOSTNAME
       - IPTS_PORT
