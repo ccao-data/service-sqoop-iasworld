@@ -1,3 +1,3 @@
 #!/bin/bash
-source /etc/docker-startup/bootstrap.sh
-/bin/bash
+source /etc/docker-config/bootstrap.sh
+exec "$@"

@@ -8,7 +8,7 @@ services:
       - ./drivers:/jdbc
       - ./scripts:/scripts
       - ./target:/tmp/target
-      - ./target/metastore:/root/.sqoop
+      - ./metastore:/root/.sqoop
     environment:
       - IPTS_HOSTNAME
       - IPTS_PORT

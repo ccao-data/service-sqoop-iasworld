@@ -2,5 +2,5 @@
 drivers/
 secrets/
 target/
-jobs/
 tables/
+metastore/

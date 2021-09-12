@@ -1,0 +1,15 @@
+sqoop job -libjars /tmp/bindir/ -jt local \
+    --fs file:/// \
+    --create ${IPTS_TABLE} -- import \
+    --bindir /tmp/bindir/ \
+    --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
+    --username ${IPTS_USERNAME} \
+    --password-file /run/secrets/IPTS_PASSWORD \
+    --query "SELECT * FROM IASWORLD.${IPTS_TABLE} WHERE \$CONDITIONS" \
+    --split-by TAXYR \
+    --map-column-java TAXYR=Integer \
+    --target-dir /tmp/target/${IPTS_TABLE} \
+    --as-parquetfile \
+    --incremental append \
+    --check-column IASW_ID \
+    --last-value 0
