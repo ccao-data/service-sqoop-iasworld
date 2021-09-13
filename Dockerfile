@@ -87,10 +87,12 @@ RUN curl -sk https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VER}/
 COPY docker-config/ssh_config /root/.ssh/config
 RUN chmod 600 /root/.ssh/config && \
     chown root:root /root/.ssh/config && \
-    ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key && \
     ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key && \
-    ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa && \
-    cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+    ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key && \
+    ssh-keygen -q -N "" -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /etc/ssh/ssh_host_ed25519_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /root/.ssh/id_ed25519 && \
+    cp /root/.ssh/id_ed25519.pub /root/.ssh/authorized_keys
 
 # Fix 254 error code
 RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/" /etc/ssh/sshd_config && \
@@ -124,6 +126,15 @@ COPY docker-config/init.sh /etc/docker-config/init.sh
 RUN chown -R root:root /etc/docker-config/ && \
     chmod -R 700 /etc/docker-config/ && \
     /etc/docker-config/init.sh
+
+# Hdfs ports
+EXPOSE 50010 50020 50070 50075 50090 8020 9000
+# Mapred ports
+EXPOSE 10020 19888
+# Yarn ports
+EXPOSE 8030 8031 8032 8033 8040 8042 8088
+# Other ports
+EXPOSE 49707 2122
 
 
 ##### CREATE MAIN SQOOP IMAGE #####
