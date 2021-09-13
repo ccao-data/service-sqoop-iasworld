@@ -54,6 +54,7 @@ push:
   only:
     - master
   script:
+    - CI_IMAGE_TAG=$(if [ ${CI_COMMIT_REF_NAME} == master ]; then echo latest; else echo $CI_COMMIT_REF_NAME; fi)
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_IMAGE_TAG
     - docker push $CI_REGISTRY_IMAGE:$CI_IMAGE_TAG
