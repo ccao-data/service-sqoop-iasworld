@@ -163,7 +163,7 @@ RUN curl -s http://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}
 # Make dirs for class files and jars
 RUN mkdir -p /tmp/bindir /tmp/target && \
     chmod +x ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
-    chown root:root ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh 
+    chown root:root ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 
 # Entrypoint/startup for sqoop
 COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 

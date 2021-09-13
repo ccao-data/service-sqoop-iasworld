@@ -10,11 +10,13 @@ x-default: &node
     - ./target:/tmp/target
     - ./metastore:/root/.sqoop
   environment:
-    - MASTER_HOSTNAME=sqoop-master
+    - MASTER_HOSTNAME=sqoop-node-master
+    - NODE_HOSTNAMES=sqoop-node-2 sqoop-node-3
     - IPTS_HOSTNAME
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
+    - IPTS_TABLE=DWELDAT
   secrets:
     - IPTS_PASSWORD
   networks:
@@ -22,31 +24,37 @@ x-default: &node
 
 # Main master node service
 services:
-  sqoop-master:
-    container_name: sqoop-master
-    hostname: sqoop-master
+  sqoop-node-master:
     <<: *node
-      #command: /scripts/create_jobs.sh
-    command: tail -f /dev/null
+    container_name: sqoop-node-master
+    hostname: sqoop-node-master
+    command: /scripts/run_jobs.sh
+    ports:
+      - 9870:9870
+      - 9864:9864
+      - 8080:8080
+      - 8088:8088
 
-  node-2:
+  sqoop-node-2:
     <<: *node
+    container_name: sqoop-node-2
     command: tail -f /dev/null
     depends_on:
-      - sqoop-master
+      - sqoop-node-master
 
-  node-3:
+  sqoop-node-3:
     <<: *node
+    container_name: sqoop-node-3
     command: tail -f /dev/null
     depends_on:
-      - sqoop-master
+      - sqoop-node-master
 
 networks:
   hadoopnet:
     ipam:
       config:
         - subnet: 192.51.0.0/16
-    name: hadoop_network
+    name: hadoopnet
 
 secrets:
   IPTS_PASSWORD:

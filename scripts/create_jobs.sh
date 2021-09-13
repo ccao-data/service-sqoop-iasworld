@@ -25,20 +25,20 @@ for TABLE in ${JOB_TABLES}; do
 
         # Create a sqoop job for the selected table(s). Saves to a metastore in
         # /root/.sqoop, which is mounted to ./metastore via docker compose
-        sqoop job -libjars /tmp/bindir/ -jt local \
-            --fs file:/// \
+        sqoop job -libjars /tmp/bindir/ \
             --create ${TABLE} -- import \
             --bindir /tmp/bindir/ \
             --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
             --username ${IPTS_USERNAME} \
-            --password-file /run/secrets/IPTS_PASSWORD \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS fetch first 10000 rows only" \
-            --target-dir /tmp/target/${TABLE} \
+            --password-file file:///run/secrets/IPTS_PASSWORD \
+            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
+            --target-dir /tmp/hadoop/${TABLE} \
+            --split-by TAXYR \
+            --num-mappers 4 \
             --as-parquetfile \
             --incremental append \
             --check-column IASW_ID \
             --last-value 0 \
-            -m 1 \
             --map-column-java ${COLUMN_MAPPING}
 
         echo "Created job for table: ${TABLE}"
