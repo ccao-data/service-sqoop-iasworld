@@ -119,7 +119,6 @@ RUN echo "JAVA_HOME=${JAVA_HOME}" >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && 
 RUN mkdir ${HADOOP_HOME}/input && \
     cp ${HADOOP_HOME}/etc/hadoop/*.xml ${HADOOP_HOME}/input
 COPY docker-config/site/ ${HADOOP_HOME}/etc/hadoop/
-RUN sed s/HOSTNAME/localhost/ ${HADOOP_HOME}/etc/hadoop/core-site.xml.template > ${HADOOP_HOME}/etc/hadoop/core-site.xml
 
 # Add docker startup files and dirs
 COPY docker-config/init.sh /etc/docker-config/init.sh
