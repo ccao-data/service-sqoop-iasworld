@@ -36,10 +36,14 @@ build:
       --build-arg VCS_VER=$CI_COMMIT_REF_NAME
       --build-arg VCS_ID=$CI_PROJECT_ID
       --build-arg VCS_NAMESPACE=$CI_PROJECT_NAMESPACE
-      .
+      . | tee -a ci-build.log
     - docker push $CI_REGISTRY_IMAGE:build-cache
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-
+  artifacts:
+    when: always
+    expire_in: 1 day
+    paths:
+      - ci-build.log
 
 ### PUSH ###
 push:
