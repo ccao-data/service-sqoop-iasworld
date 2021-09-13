@@ -121,7 +121,9 @@ RUN sed s/HOSTNAME/localhost/ ${HADOOP_HOME}/etc/hadoop/core-site.xml.template >
 
 # Add docker startup files and dirs
 COPY docker-config/init.sh /etc/docker-config/init.sh
-RUN /etc/docker-config/init.sh
+RUN chown -R root:root /etc/docker-config/ && \
+    chmod -R 700 /etc/docker-config/ && \
+    /etc/docker-config/init.sh
 
 
 ##### CREATE MAIN SQOOP IMAGE #####
