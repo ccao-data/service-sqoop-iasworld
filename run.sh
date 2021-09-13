@@ -10,5 +10,5 @@
 
 # # 3. aws s3 sync target dir
 
-docker-compose run --rm -e IPTS_TABLE=SALES\ DWELDAT sqoop /scripts/create_jobs.sh
-docker-compose run --rm -e IPTS_TABLE=SALES\ DWELDAT sqoop /scripts/run_jobs.sh
+docker-compose run --rm sqoop /scripts/create_jobs.sh
+docker-compose run --rm sqoop /scripts/run_jobs.sh

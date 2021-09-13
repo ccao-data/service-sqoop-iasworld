@@ -1,16 +1,16 @@
 # Check if env var exists from docker, if not, use all tables
 if [[ -z ${IPTS_TABLE} ]]; then
-    JOB_TABLES=$(awk -F"," '{print $1}' /scripts/tables-list.csv)
+    JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /scripts/tables-list.csv)
 else
     JOB_TABLES=${IPTS_TABLE}
 fi
 
-echo "Creating jobs for tables: $JOB_TABLES"
-# Create sqoop job for each table
-for TABLE in $JOB_TABLES; do
+echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
+for TABLE in ${JOB_TABLES}; do
     # Check to see if sqoop job exists
     if sqoop job --list | grep -q ${TABLE}; then
         echo "WARNING: A sqoop job already exists for table: ${TABLE}"
+        echo "Delete job with sqoop job --delete or remove metastore directory"
     else
         # Get java data type mappings from file and pass them to sqoop as
         # a comma-separated list in the format COLUMN=Type. This ensures that
@@ -32,7 +32,7 @@ for TABLE in $JOB_TABLES; do
             --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
             --username ${IPTS_USERNAME} \
             --password-file /run/secrets/IPTS_PASSWORD \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
+            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS fetch first 10000 rows only" \
             --target-dir /tmp/target/${TABLE} \
             --as-parquetfile \
             --incremental append \
