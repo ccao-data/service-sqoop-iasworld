@@ -115,10 +115,19 @@ ENV PATH $PATH:$HADOOP_HOME/bin
 RUN echo "JAVA_HOME=${JAVA_HOME}" >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
     echo "HADOOP_HOME=${HADOOP_HOME}" >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 
-# Make pseudo-distributed
+# Make distributed via Docker
 RUN mkdir ${HADOOP_HOME}/input && \
     cp ${HADOOP_HOME}/etc/hadoop/*.xml ${HADOOP_HOME}/input
 COPY docker-config/site/ ${HADOOP_HOME}/etc/hadoop/
+RUN sed s/HOSTNAME/localhost/ \
+    ${HADOOP_HOME}/etc/hadoop/core-site.xml.template \
+    > ${HADOOP_HOME}/etc/hadoop/core-site.xml && \
+    sed s/HOSTNAME/localhost/ \
+    $HADOOP_HOME/etc/hadoop/yarn-site.xml.template \
+    > /usr/local/hadoop/etc/hadoop/yarn-site.xml && \
+    sed s/HOSTNAME/localhost/ \
+    $HADOOP_HOME/etc/hadoop/mapred-site.xml.template \
+    > /usr/local/hadoop/etc/hadoop/mapred-site.xml
 
 # Add docker startup files and dirs
 COPY docker-config/init.sh /etc/docker-config/init.sh
@@ -148,7 +157,7 @@ ENV SQOOP_HOME /usr/local/sqoop
 ENV PATH $PATH:$HADOOP_HOME/bin:$SQOOP_HOME/bin
 
 # Download sqoop
-RUN curl -s https://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER}.tar.gz | tar -xz -C /usr/local && \
+RUN curl -s http://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER}.tar.gz | tar -xz -C /usr/local && \
     ln -s /usr/local/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER} ${SQOOP_HOME}
 
 # Make dirs for class files and jars

@@ -1,21 +1,52 @@
 version: '3.6'
+
+# Template for worker nodes
+x-default: &node
+  build: .
+  image: sqoop:latest 
+  volumes:
+    - ./drivers:/jdbc
+    - ./scripts:/scripts
+    - ./target:/tmp/target
+    - ./metastore:/root/.sqoop
+  environment:
+    - MASTER_HOSTNAME=sqoop-master
+    - IPTS_HOSTNAME
+    - IPTS_PORT
+    - IPTS_SERVICE_NAME
+    - IPTS_USERNAME
+  secrets:
+    - IPTS_PASSWORD
+  networks:
+    - hadoopnet
+
+# Main master node service
 services:
-  sqoop:
-    build: .
-    image: sqoop:latest 
-    container_name: sqoop
-    volumes:
-      - ./drivers:/jdbc
-      - ./scripts:/scripts
-      - ./target:/tmp/target
-      - ./metastore:/root/.sqoop
-    environment:
-      - IPTS_HOSTNAME
-      - IPTS_PORT
-      - IPTS_SERVICE_NAME
-      - IPTS_USERNAME
-    secrets:
-      - IPTS_PASSWORD
+  sqoop-master:
+    container_name: sqoop-master
+    hostname: sqoop-master
+    <<: *node
+      #command: /scripts/create_jobs.sh
+    command: tail -f /dev/null
+
+  node-2:
+    <<: *node
+    command: tail -f /dev/null
+    depends_on:
+      - sqoop-master
+
+  node-3:
+    <<: *node
+    command: tail -f /dev/null
+    depends_on:
+      - sqoop-master
+
+networks:
+  hadoopnet:
+    ipam:
+      config:
+        - subnet: 192.51.0.0/16
+    name: hadoop_network
 
 secrets:
   IPTS_PASSWORD:
