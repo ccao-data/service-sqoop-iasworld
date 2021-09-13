@@ -14,7 +14,7 @@ RUN yum install -y curl which tar bunzip2 openssl-devel gcc gcc-c++ autoconf aut
     yum clean all
 
 # Cmake3 from EPEL
-RUN curl http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm > /tmp/epel.rpm && \
+RUN curl https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm > /tmp/epel.rpm && \
     rpm -i /tmp/epel.rpm && \
     rm /tmp/epel.rpm && \
     yum install -y --enablerepo=epel cmake3 && \
@@ -134,7 +134,7 @@ ENV SQOOP_HOME /usr/local/sqoop
 ENV PATH $PATH:$HADOOP_HOME/bin:$SQOOP_HOME/bin
 
 # Download sqoop
-RUN curl -s http://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER}.tar.gz | tar -xz -C /usr/local && \
+RUN curl -s https://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER}.tar.gz | tar -xz -C /usr/local && \
     ln -s /usr/local/sqoop-${SQOOP_VER}.bin__hadoop-${HADOOP_VER} ${SQOOP_HOME}
 
 # Make dirs for class files and jars
