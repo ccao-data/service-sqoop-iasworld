@@ -5,5 +5,4 @@
 drivers/
 secrets/
 target/
-tables/
 metastore/
