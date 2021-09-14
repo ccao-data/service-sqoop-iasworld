@@ -23,28 +23,32 @@ build:
   only:
     - master
   script:
-    - docker pull $CI_REGISTRY_IMAGE:build-cache || true
+    - docker pull $CI_REGISTRY_IMAGE:build-native-hadoop-cache || true
     - >
       docker build
       --pull
-      --cache-from $CI_REGISTRY_IMAGE:build-cache
-      --tag $CI_REGISTRY_IMAGE:build-cache
+      --cache-from $CI_REGISTRY_IMAGE:build-native-hadoop-cache
+      --tag $CI_REGISTRY_IMAGE:build-native-hadoop-cache
+      --tag build-native-hadoop
+      -f build-native-hadoop.Dockerfile
+      . | tee -a build-native-hadoop.log
+    - docker push $CI_REGISTRY_IMAGE:build-native-hadoop-cache
+    - >
+      docker build
+      --pull
+      --cache-from $CI_REGISTRY_IMAGE:build-sqoop-cache
+      --tag $CI_REGISTRY_IMAGE:build-sqoop-cache
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-      --build-arg VCS_NAME=$CI_PROJECT_NAME
-      --build-arg VCS_URL=$CI_PROJECT_URL
-      --build-arg VCS_REF=$CI_COMMIT_SHA
-      --build-arg VCS_REF_SHORT=$CI_COMMIT_SHORT_SHA
-      --build-arg VCS_VER=$CI_COMMIT_REF_NAME
-      --build-arg VCS_ID=$CI_PROJECT_ID
-      --build-arg VCS_NAMESPACE=$CI_PROJECT_NAMESPACE
-      . | tee -a ci-build.log
-    - docker push $CI_REGISTRY_IMAGE:build-cache
+      -f build-sqoop.Dockerfile
+      . | tee -a build-sqoop.log
+    - docker push $CI_REGISTRY_IMAGE:build-sqoop-cache
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   artifacts:
     when: always
     expire_in: 1 day
     paths:
-      - ci-build.log
+      - build-native-hadoop.log
+      - build-sqoop.log
 
 ### PUSH ###
 push:
