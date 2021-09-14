@@ -20,7 +20,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk
 ENV PATH $PATH:$JAVA_HOME/bin
 
 # Grab built nativelibs from prior stage
-COPY --from=build-native-hadoop /tmp/native.tar.gz /tmp/native.tar.gz
+COPY --from=registry.gitlab.com/ccao-data-science---modeling/services/service_sqoop_iasworld:build-native-hadoop-cache /tmp/native.tar.gz /tmp/native.tar.gz
 RUN mkdir -p /tmp/native && \
     cd /tmp/ && \
     tar xvzf /tmp/native.tar.gz
