@@ -22,7 +22,7 @@ services:
   sqoop-node-master:
     <<: *node
     container_name: sqoop-node-master
-    command: source /scripts/create_jobs.sh
+    command: /bin/bash /scripts/create_jobs.sh
 
 secrets:
   IPTS_PASSWORD:
