@@ -12,7 +12,6 @@ for TABLE in ${JOB_TABLES}; do
     # Check to see if sqoop job exists
     if sqoop job --list | grep -q ${TABLE}; then
         echo "WARNING: A sqoop job already exists for table: ${TABLE}"
-        echo "Delete job with sqoop job --delete or remove metastore directory"
     else
         # Get java data type mappings from file and pass them to sqoop as
         # a comma-separated list in the format COLUMN=Type. This ensures that
