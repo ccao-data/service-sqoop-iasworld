@@ -16,6 +16,7 @@ x-default: &node
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
+    - IPTS_TABLE=CNAME LEGDAT CVLEG
   secrets:
     - IPTS_PASSWORD
   networks:

@@ -6,3 +6,4 @@ drivers/
 secrets/
 target/
 metastore/
+logs/
