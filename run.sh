@@ -31,7 +31,7 @@ aws s3 sync \
 
 # Dump log file to S3 after compressing to zstd
 LOG_FILE="logs/$(date +%Y-%m-%d)-sqoop-log.txt"
-zstd --rm ${TEMP_LOG_FILE} -o ${LOG_FILE}.zst
+zstd -f --rm ${TEMP_LOG_FILE} -o ${LOG_FILE}.zst
 aws s3 sync \
     logs/ \
     s3://dev-ccap-athenapoc-landingzone-us-east1/iasworld/logs \
