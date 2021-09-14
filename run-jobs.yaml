@@ -29,7 +29,7 @@ services:
     <<: *node
     container_name: sqoop-node-master
     hostname: sqoop-node-master
-    command: /scripts/run_jobs.sh
+    command: source /scripts/run_jobs.sh
     ports:
       - 9870:9870
       - 9864:9864

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Check if env var exists from docker, if not, use all tables
 if [[ -z ${IPTS_TABLE} ]]; then
     JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /scripts/tables-list.csv)
