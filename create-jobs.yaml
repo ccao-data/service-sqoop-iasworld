@@ -1,0 +1,28 @@
+version: '3.6'
+
+x-default: &node
+  build: .
+  image: sqoop:latest 
+  volumes:
+    - ./drivers:/jdbc
+    - ./scripts:/scripts
+    - ./metastore:/root/.sqoop
+  environment:
+    - MASTER_HOSTNAME=sqoop-node-master
+    - IPTS_HOSTNAME
+    - IPTS_PORT
+    - IPTS_SERVICE_NAME
+    - IPTS_USERNAME
+    - IPTS_TABLE=COMDAT
+  secrets:
+    - IPTS_PASSWORD
+
+services:
+  sqoop-node-master:
+    <<: *node
+    container_name: sqoop-node-master
+    command: /scripts/create_jobs.sh
+
+secrets:
+  IPTS_PASSWORD:
+    file: secrets/IPTS_PASSWORD

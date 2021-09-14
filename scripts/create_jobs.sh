@@ -32,9 +32,9 @@ for TABLE in ${JOB_TABLES}; do
             --username ${IPTS_USERNAME} \
             --password-file file:///run/secrets/IPTS_PASSWORD \
             --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
-            --target-dir /tmp/hadoop/${TABLE} \
+            --target-dir /user/root/target/${TABLE} \
             --split-by TAXYR \
-            --num-mappers 4 \
+            --num-mappers 8 \
             --as-parquetfile \
             --incremental append \
             --check-column IASW_ID \

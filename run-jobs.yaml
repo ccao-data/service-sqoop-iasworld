@@ -5,18 +5,18 @@ x-default: &node
   build: .
   image: sqoop:latest 
   volumes:
-    - ./drivers:/jdbc
+    - ./drivers:/jdbc # fsdfsd
     - ./scripts:/scripts
     - ./target:/tmp/target
     - ./metastore:/root/.sqoop
   environment:
     - MASTER_HOSTNAME=sqoop-node-master
-    - NODE_HOSTNAMES=sqoop-node-2 sqoop-node-3
+    - NODE_HOSTNAMES=sqoop-node-2 sqoop-node-3 sqoop-node-4
     - IPTS_HOSTNAME
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
-    - IPTS_TABLE=DWELDAT
+    - IPTS_TABLE=COMDAT
   secrets:
     - IPTS_PASSWORD
   networks:
@@ -34,19 +34,27 @@ services:
       - 9864:9864
       - 8080:8080
       - 8088:8088
+      - 8042:8042
 
   sqoop-node-2:
     <<: *node
     container_name: sqoop-node-2
     command: tail -f /dev/null
-    depends_on:
+    depends_on: 
       - sqoop-node-master
 
   sqoop-node-3:
     <<: *node
     container_name: sqoop-node-3
     command: tail -f /dev/null
-    depends_on:
+    depends_on: 
+      - sqoop-node-master
+
+  sqoop-node-4:
+    <<: *node
+    container_name: sqoop-node-4
+    command: tail -f /dev/null
+    depends_on: 
       - sqoop-node-master
 
 networks:
