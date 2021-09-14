@@ -22,8 +22,7 @@ aws s3 sync \
 aws s3 sync \
     target/ \
     s3://dev-ccap-athenapoc-landingzone-us-east1/iasworld/data \
-    --exclude "*" \
-    --include "*.parquet" \
+    --exclude "*gitkeep" \
     | tee -a ${TEMP_LOG_FILE}
 
 # Dump log file to S3 after compressing to zstd
