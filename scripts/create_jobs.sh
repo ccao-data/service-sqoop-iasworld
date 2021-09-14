@@ -23,24 +23,50 @@ for TABLE in ${JOB_TABLES}; do
             | paste -sd,
         )
 
-        # Create a sqoop job for the selected table(s). Saves to a metastore in
-        # /root/.sqoop, which is mounted to ./metastore via docker compose
-        sqoop job -libjars /tmp/bindir/ \
-            --create ${TABLE} -- import \
-            --bindir /tmp/bindir/ \
-            --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
-            --username ${IPTS_USERNAME} \
-            --password-file file:///run/secrets/IPTS_PASSWORD \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
-            --target-dir /user/root/target/${TABLE} \
-            --split-by TAXYR \
-            --num-mappers 8 \
-            --as-parquetfile \
-            --incremental append \
-            --check-column IASW_ID \
-            --last-value 0 \
-            --map-column-java ${COLUMN_MAPPING}
+        # TRUE/FALSE table contains TAXYR column to split on
+        MAPPING_TYPE=$(awk -F"," \
+            -v table=${TABLE} \
+            '$1 == table {print $2}' \
+            /scripts/tables-list.csv |
+            tr -d "\n" | tr -d "\r"
+        )
 
+        # Create a sqoop job for the selected table(s). Saves to a metastore in
+        # /root/.sqoop, which is mounted to ./metastore via docker compose.
+        # The if statement here checks if the table contains TAXYR. If it does,
+        # then the job is run in parallel. Otherwise it's run on a single process
+        if [[ ${MAPPING_TYPE} == TRUE ]]; then
+            sqoop job -libjars /tmp/bindir/ \
+                --create ${TABLE} -- import \
+                --bindir /tmp/bindir/ \
+                --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
+                --username ${IPTS_USERNAME} \
+                --password-file file:///run/secrets/IPTS_PASSWORD \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
+                --target-dir /user/root/target/${TABLE} \
+                --as-parquetfile \
+                --incremental append \
+                --check-column IASW_ID \
+                --last-value 0 \
+                --map-column-java ${COLUMN_MAPPING} \
+                --split-by TAXYR \
+                --num-mappers 8
+        else
+            sqoop job -libjars /tmp/bindir/ \
+                --create ${TABLE} -- import \
+                --bindir /tmp/bindir/ \
+                --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
+                --username ${IPTS_USERNAME} \
+                --password-file file:///run/secrets/IPTS_PASSWORD \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
+                --target-dir /user/root/target/${TABLE} \
+                --as-parquetfile \
+                --incremental append \
+                --check-column IASW_ID \
+                --last-value 0 \
+                --map-column-java ${COLUMN_MAPPING} \
+                -m 1
+        fi
         echo "Created job for table: ${TABLE}"
     fi
 done

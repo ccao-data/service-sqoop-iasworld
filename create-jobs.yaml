@@ -13,7 +13,6 @@ x-default: &node
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
-    - IPTS_TABLE=COMDAT
   secrets:
     - IPTS_PASSWORD
 
