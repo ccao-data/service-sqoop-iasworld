@@ -38,10 +38,11 @@ tables <- tables %>%
     DATA_TYPE == "CLOB" ~ "String",
     DATA_TYPE == "VARCHAR2" ~ "String",
     DATA_TYPE == "DATE" ~ "String",
-    DATA_TYPE == "NUMBER" & DATA_PRECISION <= 10 ~ "Integer",
-    DATA_TYPE == "NUMBER" & DATA_PRECISION <= 19 ~ "Double",
-    DATA_TYPE == "NUMBER" & is.na(DATA_PRECISION) ~ "Double",
+    DATA_TYPE == "NUMBER" & DATA_PRECISION <= 10  ~ "Integer",
+    DATA_TYPE == "NUMBER" & DATA_PRECISION <= 12  ~ "Double",
+    DATA_TYPE == "NUMBER" & DATA_PRECISION > 12   ~ "String",
+    DATA_TYPE == "NUMBER" & is.na(DATA_PRECISION) ~ "Double"
   )) %>%
   arrange(TABLE_NAME)
 
-write_csv(tables, "tables-mapping.csv")
+write_csv(tables, "tables-mapping.csv", quote = "none")
