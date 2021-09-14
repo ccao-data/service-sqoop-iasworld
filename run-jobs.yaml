@@ -2,8 +2,10 @@ version: '3.6'
 
 # Template for worker nodes
 x-default: &node
-  build: .
-  image: sqoop:latest 
+  build:
+    context: .
+    dockerfile: build-sqoop.Dockerfile
+  image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
   volumes:
     - ./drivers:/jdbc # fsdfsd
     - ./scripts:/scripts

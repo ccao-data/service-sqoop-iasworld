@@ -1,8 +1,10 @@
 version: '3.6'
 
 x-default: &node
-  build: .
-  image: sqoop:latest 
+  build:
+    context: .
+    dockerfile: build-sqoop.Dockerfile
+  image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
   volumes:
     - ./drivers:/jdbc
     - ./scripts:/scripts
