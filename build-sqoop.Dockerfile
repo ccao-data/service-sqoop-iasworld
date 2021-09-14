@@ -108,4 +108,8 @@ RUN mkdir -p /tmp/bindir /tmp/target && \
 # Entrypoint/startup for sqoop
 COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 
 COPY docker-config/bootstrap.sh docker-config/entrypoint.sh /etc/docker-config/
+RUN chown -R root:root /etc/docker-config/ && \
+    chmod -R 700 /etc/docker-config/
+
+# Define script to run at startup
 ENTRYPOINT ["/etc/docker-config/entrypoint.sh"]
