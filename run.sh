@@ -4,11 +4,13 @@
 TEMP_LOG_FILE="logs/temp-sqoop-log.txt"
 
 # Create sqoop jobs. These are saved in the metastore/ directory
-docker-compose -f create-jobs.yaml up \
+docker-compose --remove-orphans \
+    -f create-jobs.yaml up \
     | tee ${TEMP_LOG_FILE}
 
 # Run all sqoop jobs. Parquet files are output to target/ directory
-docker-compose -f run-jobs.yaml up --abort-on-container-exit \
+docker-compose --remove-orphans \
+    -f run-jobs.yaml up --abort-on-container-exit \
     | tee -a ${TEMP_LOG_FILE}
 
 # Sync metastore/ directory to S3
