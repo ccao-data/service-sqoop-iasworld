@@ -40,7 +40,7 @@ for TABLE in ${JOB_TABLES}; do
             sqoop job -libjars /tmp/bindir/ \
                 --create ${TABLE} -- import \
                 --bindir /tmp/bindir/ \
-                --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
+                --connect "jdbc:oracle:thin:@(DESCRIPTION=(CONNECT_TIMEOUT=600 s)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=${IPTS_HOSTNAME})(PORT=${IPTS_PORT})))(CONNECT_DATA=(SERVICE_NAME=${IPTS_SERVICE_NAME})))" \
                 --username ${IPTS_USERNAME} \
                 --password-file file:///run/secrets/IPTS_PASSWORD \
                 --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
