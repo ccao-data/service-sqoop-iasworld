@@ -2,6 +2,7 @@
 
 # Name for log file. Since this is a daily export, we want one for each day
 TEMP_LOG_FILE="logs/temp-sqoop-log.txt"
+BUCKET_URI="s3://ccao-landing-us-east-1"
 
 # Create sqoop jobs. These are saved in the metastore/ directory
 docker-compose \
@@ -18,21 +19,21 @@ docker-compose \
 # Sync metastore/ directory to S3
 aws s3 sync \
     metastore/ \
-    s3://dev-ccap-athenapoc-landingzone-us-east1/iasworld/metastore \
+    ${BUCKET_URI}/iasworld/metastore \
     --exclude "*gitkeep" \
     | tee -a ${TEMP_LOG_FILE}
 
 # Sync target/ directory to S3
 aws s3 sync \
     target/ \
-    s3://dev-ccap-athenapoc-landingzone-us-east1/iasworld/data \
+    ${BUCKET_URI}/iasworld/data \
     --exclude "*gitkeep" \
     | tee -a ${TEMP_LOG_FILE}
 
 # Dump log file to S3 after compressing to zstd
-LOG_FILE="logs/$(date +%Y-%m-%d)-sqoop-log.txt"
+LOG_FILE="logs/$(date -u -Iseconds)-sqoop-log.txt"
 zstd -f --rm ${TEMP_LOG_FILE} -o ${LOG_FILE}.zst
 aws s3 sync \
     logs/ \
-    s3://dev-ccap-athenapoc-landingzone-us-east1/iasworld/logs \
+    ${BUCKET_URI}/iasworld/logs \
     --exclude "*gitkeep" \
