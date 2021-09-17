@@ -38,3 +38,11 @@ You can query a single table by adding an environmental variable named `IPTS_TAB
     ...
 ...
 ```
+
+## Managing Sqoop Jobs
+
+Sometimes you may need to manually delete or update `sqoop` jobs. To do so, you'll need to create a shell inside the docker sqoop container:
+
+```bash
+docker-compose -f create-jobs.yaml run sqoop-node-master /bin/bash
+```
