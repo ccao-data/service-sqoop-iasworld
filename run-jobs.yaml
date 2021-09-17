@@ -62,7 +62,7 @@ networks:
   hadoopnet:
     ipam:
       config:
-        - subnet: 192.51.0.0/16
+        - subnet: 211.51.0.0/16
     name: hadoopnet
 
 secrets:
