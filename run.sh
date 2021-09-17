@@ -17,23 +17,26 @@ docker-compose \
     | tee -a ${TEMP_LOG_FILE}
 
 # Sync metastore/ directory to S3
+# Need to keep a local copy in order to save state
 aws s3 sync \
     metastore/ \
     ${BUCKET_URI}/iasworld/metastore \
     --exclude "*gitkeep" \
     | tee -a ${TEMP_LOG_FILE}
 
-# Sync target/ directory to S3
-aws s3 sync \
+# Move target/ directory to S3
+aws s3 mv \
     target/ \
     ${BUCKET_URI}/iasworld/data \
     --exclude "*gitkeep" \
+    --recursive \
     | tee -a ${TEMP_LOG_FILE}
 
-# Dump log file to S3 after compressing to zstd
+# Move log file to S3 after compressing to zstd
 LOG_FILE="logs/$(date -u -Iseconds)-sqoop-log.txt"
 zstd -f --rm ${TEMP_LOG_FILE} -o ${LOG_FILE}.zst
-aws s3 sync \
+aws s3 mv \
     logs/ \
     ${BUCKET_URI}/iasworld/logs \
     --exclude "*gitkeep" \
+    --recursive
