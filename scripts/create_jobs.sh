@@ -34,6 +34,7 @@ for TABLE in ${JOB_TABLES}; do
 
         # Full options passed to every sqoop job
         SQOOP_OPTIONS=(job -libjars /tmp/bindir/ \
+            -D mapred.child.java.opts="-Djava.security.egd=file:///dev/../dev/urandom" \
             --create ${TABLE} -- import \
             --bindir /tmp/bindir/ \
             --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \

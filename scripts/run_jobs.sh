@@ -12,7 +12,8 @@ hdfs dfs -mkdir -p /user/root/
 
 echo "Running jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
-    sqoop job -libjars /tmp/bindir/ -jt local --fs file:/// \
+    sqoop job -libjars /tmp/bindir/ \
+        -D mapred.child.java.opts="-Djava.security.egd=file:///dev/../dev/urandom" \
         --exec ${TABLE}
 
     # Copy from distributed file system (HDFS) to local mounted dir
