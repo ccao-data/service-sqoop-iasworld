@@ -12,8 +12,13 @@ hdfs dfs -mkdir -p /user/root/
 
 echo "Running jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
-    sqoop job -libjars /tmp/bindir/ \
-        --exec ${TABLE}
+    if [[ ${TABLE} == ASMT\_* ]]; then
+        sqoop job -libjars /tmp/bindir/ --exec ${TABLE}_PART1
+        sqoop job -libjars /tmp/bindir/ --exec ${TABLE}_PART2
+        sqoop job -libjars /tmp/bindir/ --exec ${TABLE}_PART3
+    else
+        sqoop job -libjars /tmp/bindir/ --exec ${TABLE}
+    fi
 
     # Copy from distributed file system (HDFS) to local mounted dir,
     # then delete to save space in container

@@ -10,7 +10,7 @@ fi
 echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
     # Check to see if sqoop job already exists
-    if sqoop job --list | grep -q ${TABLE}; then
+    if sqoop job --list | grep -q ${TABLE} && [[ ${TABLE} != ASMT\_* ]]; then
         echo "WARNING: A sqoop job already exists for table: ${TABLE}"
     else
         # Get java data type mappings from file and pass them to sqoop as
@@ -32,14 +32,17 @@ for TABLE in ${JOB_TABLES}; do
             tr -d "\n" | tr -d "\r"
         )
 
-        # Full options passed to every sqoop job
-        SQOOP_OPTIONS=(job -libjars /tmp/bindir/ \
-            --create ${TABLE} -- import \
+        # Options passed to sqoop
+        SQOOP_OPTIONS_JOB=(
+            job -libjars /tmp/bindir/ \
+            --create ${TABLE}_PART2 -- import
+        )
+
+        SQOOP_OPTIONS_MAIN=(
             --bindir /tmp/bindir/ \
             --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
             --username ${IPTS_USERNAME} \
             --password-file file:///run/secrets/IPTS_PASSWORD \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
             --target-dir /user/root/target/${TABLE} \
             --as-parquetfile \
             --incremental append \
@@ -48,17 +51,50 @@ for TABLE in ${JOB_TABLES}; do
             --map-column-java ${COLUMN_MAPPING}
         )
 
+        SQOOP_OPTIONS_SPLIT=(
+            --split-by TAXYR \
+            --num-mappers 8
+        )
+
         # Create a sqoop job for the selected table(s). Saves to a metastore in
         # /root/.sqoop, which is mounted to ./metastore via docker compose.
-        # The if statement here checks if the table contains TAXYR. If it does,
-        # then the job is run in parallel. Otherwise it's run on a single process
-        if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
-            sqoop "${SQOOP_OPTIONS[@]}" \
-                --split-by TAXYR \
-                --num-mappers 8
+        # The if statement here breaks up ASMT_ALL and ASMT_HIST into two
+        # separate jobs (otherwise they time out), and specifies the number of
+        # mappers for jobs that can be split by TAXYR
+        if [[ ${TABLE} == ASMT\_* ]]; then
+
+            sqoop job -libjars /tmp/bindir/ \
+                --create ${TABLE}_PART1 -- import \
+                "${SQOOP_OPTIONS_MAIN[@]}" \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE TAXYR <= 2007 AND \$CONDITIONS" \
+                "${SQOOP_OPTIONS_SPLIT[@]}"
+
+            sqoop job -libjars /tmp/bindir/ \
+                --create ${TABLE}_PART2 -- import \
+                "${SQOOP_OPTIONS_MAIN[@]}" \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE TAXYR BETWEEN 2008 AND 2015 AND \$CONDITIONS" \
+                "${SQOOP_OPTIONS_SPLIT[@]}"
+
+            sqoop job -libjars /tmp/bindir/ \
+                --create ${TABLE}_PART3 -- import \
+                "${SQOOP_OPTIONS_MAIN[@]}" \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE TAXYR >= 2016 AND \$CONDITIONS" \
+                "${SQOOP_OPTIONS_SPLIT[@]}"
+
+        elif [[ ${CONTAINS_TAXYR} == TRUE ]]; then
+
+            sqoop "${SQOOP_OPTIONS_JOB[@]}" \
+                "${SQOOP_OPTIONS_MAIN[@]}" \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
+                "${SQOOP_OPTIONS_SPLIT[@]}"
+
         else
-            sqoop "${SQOOP_OPTIONS[@]}" \
+
+            sqoop "${SQOOP_OPTIONS_JOB[@]}" \
+                "${SQOOP_OPTIONS_MAIN[@]}" \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
                 -m 1
+
         fi
         echo "Created job for table: ${TABLE}"
     fi
