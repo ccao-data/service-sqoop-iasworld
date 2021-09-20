@@ -107,7 +107,7 @@ RUN mkdir -p /tmp/bindir /tmp/target && \
 
 # Replace random generator in java to fix bug:
 # https://stackoverflow.com/questions/2327220/oracle-jdbc-intermittent-connection-issue
-RUN sed 's/securerandom.source=file\:\/dev\/random/securerandom.source=file\:\/dev\/..\/dev\/urandom/' ${JAVA_HOME}/jre/lib/security/java.security
+RUN sed -i "s/securerandom.source=file\:\/dev\/random/securerandom.source=file\:\/dev\/..\/dev\/urandom/" ${JAVA_HOME}/jre/lib/security/java.security
 
 # Entrypoint/startup for sqoop
 COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 
