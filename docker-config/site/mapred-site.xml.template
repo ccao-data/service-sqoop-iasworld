@@ -4,6 +4,10 @@
         <value>yarn</value>
     </property>
     <property>
+        <name>mapreduce.admin.map.child.java.opts</name>
+        <value>-Djava.security.egd=file:///dev/./urandom</value>
+    </property>
+    <property>
         <name>mapreduce.job.tracker</name>
         <value>HOSTNAME:9001</value>
     </property>

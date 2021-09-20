@@ -12,7 +12,11 @@ hdfs dfs -mkdir -p /user/root/
 
 echo "Running jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
-    sqoop job -libjars /tmp/bindir/ --exec ${TABLE}
+    sqoop job -libjars /tmp/bindir/ \
+        -D -Djava.security.egd=file:///dev/./urandom \
+        -D securerandom.source=file:///dev/./urandom \
+        -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
+        --exec ${TABLE}
 
     # Copy from distributed file system (HDFS) to local mounted dir,
     # then delete to save space in container
