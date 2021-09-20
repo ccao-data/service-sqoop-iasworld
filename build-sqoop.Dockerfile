@@ -44,7 +44,7 @@ RUN chmod 600 /root/.ssh/config && \
     cp /root/.ssh/id_ed25519.pub /root/.ssh/authorized_keys
 
 # Fix 254 error code
-RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/" /etc/ssh/sshd_config && \
+RUN sed -i "/^[^#]*UsePAM/ s/.*/#&/" /etc/ssh/sshd_config && \
     echo "UsePAM no" >> /etc/ssh/sshd_config && \
     echo "Port 2122" >> /etc/ssh/sshd_config
 
@@ -104,6 +104,10 @@ RUN curl -s http://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}
 RUN mkdir -p /tmp/bindir /tmp/target && \
     chmod +x ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
     chown root:root ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
+
+# Replace random generator in java to fix bug:
+# https://stackoverflow.com/questions/2327220/oracle-jdbc-intermittent-connection-issue
+RUN sed 's/securerandom.source=file\:\/dev\/random/securerandom.source=file\:\/dev\/..\/dev\/urandom/' ${JAVA_HOME}/jre/lib/security/java.security
 
 # Entrypoint/startup for sqoop
 COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 

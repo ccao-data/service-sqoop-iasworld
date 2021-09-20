@@ -13,11 +13,12 @@ hdfs dfs -mkdir -p /user/root/
 echo "Running jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
     sqoop job -libjars /tmp/bindir/ \
-        -D mapred.child.java.opts="-Djava.security.egd=file:///dev/../dev/urandom" \
         --exec ${TABLE}
 
-    # Copy from distributed file system (HDFS) to local mounted dir
+    # Copy from distributed file system (HDFS) to local mounted dir,
+    # then delete to save space in container
     hdfs dfs -copyToLocal /user/root/target/${TABLE} /tmp/target
+    hdfs dfs -rm -r -f /user/root/target/${TABLE}
 
     echo "Completed job for table: ${TABLE}"
 done
