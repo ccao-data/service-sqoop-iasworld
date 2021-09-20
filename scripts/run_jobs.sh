@@ -13,15 +13,11 @@ hdfs dfs -mkdir -p /user/root/
 echo "Running jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
 
-    # For ASMT_ tables, run jobs in batches. All other tables are job
-    # per table
-    if [[ ${TABLE} == ASMT\_* ]]; then
-        for YEAR in $(seq -s " " 1999 4 `date +"%Y"`); do
-            sqoop job -libjars /tmp/bindir/ --exec ${TABLE}_${YEAR}
-        done
-    else
-        sqoop job -libjars /tmp/bindir/ --exec ${TABLE}
-    fi
+    # Execute saved sqoop job
+    sqoop job -libjars /tmp/bindir/ \
+        -D java.security.egd=file:/dev/../dev/urandom \
+        -D mapred.child.java.opts="-Djava.security.egd=file:/dev/../dev/urandom" \
+        --exec ${TABLE}
 
     # Copy from distributed file system (HDFS) to local mounted dir,
     # then delete to save space in container

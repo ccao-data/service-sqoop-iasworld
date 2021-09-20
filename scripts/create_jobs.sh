@@ -10,7 +10,7 @@ fi
 echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
     # Check to see if sqoop job already exists
-    if sqoop job --list | grep -q ${TABLE} && [[ ${TABLE} == ASMT\_* ]]; then
+    if sqoop job --list | grep -q ${TABLE}; then
         echo "WARNING: A sqoop job already exists for table: ${TABLE}"
     else
         # Get java data type mappings from file and pass them to sqoop as
@@ -35,10 +35,11 @@ for TABLE in ${JOB_TABLES}; do
         # Options passed to sqoop
         SQOOP_OPTIONS_JOB=(
             job -libjars /tmp/bindir/ \
-            -D mapred.child.java.opts="-Djava.security.egd=file:///dev/../dev/urandom" \
+            -D java.security.egd=file:/dev/../dev/urandom \
+            -D mapred.child.java.opts="-Djava.security.egd=file:/dev/../dev/urandom" \
             --create ${TABLE} -- import \
             --target-dir /user/root/target/${TABLE} \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
+            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS"
         )
 
         SQOOP_OPTIONS_MAIN=(
@@ -55,42 +56,22 @@ for TABLE in ${JOB_TABLES}; do
 
         SQOOP_OPTIONS_SPLIT=(
             --split-by TAXYR \
-            --num-mappers 8
+            --num-mappers 8 \
+            --boundary-query "SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}"
         )
 
         # Create a sqoop job for the selected table(s). Saves to a metastore in
         # /root/.sqoop, which is mounted to ./metastore via docker compose
-        if [[ ${TABLE} == ASMT\_* ]]; then
-
-            # Split job for ASMT tables into multiple parts to prevent timeouts
-            for YEAR in $(seq -s " " 1999 4 `date +"%Y"`); do
-                sqoop job -libjars /tmp/bindir/ \
-                    -D mapred.child.java.opts="-Djava.security.egd=file:///dev/../dev/urandom" \
-                    --create ${TABLE}_${YEAR} -- import \
-                    --target-dir /user/root/target/${TABLE} \
-                    --query "
-                        SELECT * FROM IASWORLD.${TABLE}
-                        WHERE TAXYR BETWEEN ${YEAR} AND (${YEAR} + 3)
-                        AND \$CONDITIONS" \
-                    "${SQOOP_OPTIONS_MAIN[@]}" \
-                    "${SQOOP_OPTIONS_SPLIT[@]}"
-            done
-
-        elif [[ ${CONTAINS_TAXYR} == TRUE ]]; then
-
-            # For all other tables with TAXYR column, create a single job
-            # splitting by TAXYR
+        if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
+            # For all tables with TAXYR column, create a job split by TAXYR
             sqoop "${SQOOP_OPTIONS_JOB[@]}" \
                 "${SQOOP_OPTIONS_MAIN[@]}" \
                 "${SQOOP_OPTIONS_SPLIT[@]}"
-
         else
-
             # For tables with no TAXYR column, just make a job with no split
             sqoop "${SQOOP_OPTIONS_JOB[@]}" \
                 "${SQOOP_OPTIONS_MAIN[@]}" \
                 -m 1
-
         fi
         echo "Created job for table: ${TABLE}"
     fi
