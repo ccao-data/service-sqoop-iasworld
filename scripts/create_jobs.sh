@@ -10,7 +10,7 @@ fi
 echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
     # Check to see if sqoop job already exists
-    if sqoop job --list | grep -q ${TABLE} && [[ ${TABLE} != ASMT\_* ]]; then
+    if sqoop job --list | grep -q ${TABLE} && [[ ${TABLE} != ASMT_ALL ]]; then
         echo "WARNING: A sqoop job already exists for table: ${TABLE}"
     else
         # Get java data type mappings from file and pass them to sqoop as
@@ -35,7 +35,9 @@ for TABLE in ${JOB_TABLES}; do
         # Options passed to sqoop
         SQOOP_OPTIONS_JOB=(
             job -libjars /tmp/bindir/ \
-            --create ${TABLE}_PART2 -- import
+            --create ${TABLE}_PART2 -- import \
+            --target-dir /user/root/target/${TABLE} \
+            --query "SELECT * FROM IASWORLD.${TABLE} WHERE CUR = 'Y' AND \$CONDITIONS" \
         )
 
         SQOOP_OPTIONS_MAIN=(
@@ -43,7 +45,6 @@ for TABLE in ${JOB_TABLES}; do
             --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
             --username ${IPTS_USERNAME} \
             --password-file file:///run/secrets/IPTS_PASSWORD \
-            --target-dir /user/root/target/${TABLE} \
             --as-parquetfile \
             --incremental append \
             --check-column IASW_ID \
@@ -61,38 +62,25 @@ for TABLE in ${JOB_TABLES}; do
         # The if statement here breaks up ASMT_ALL and ASMT_HIST into two
         # separate jobs (otherwise they time out), and specifies the number of
         # mappers for jobs that can be split by TAXYR
-        if [[ ${TABLE} == ASMT\_* ]]; then
+        if [[ ${TABLE} == ASMT_ALL ]]; then
 
             sqoop job -libjars /tmp/bindir/ \
-                --create ${TABLE}_PART1 -- import \
+                --create ${TABLE} -- import \
+                --target-dir /user/root/target/ASMT \
+                --query "SELECT * FROM IASWORLD.${TABLE} WHERE CUR = 'Y' AND \$CONDITIONS" \
                 "${SQOOP_OPTIONS_MAIN[@]}" \
-                --query "SELECT * FROM IASWORLD.${TABLE} WHERE TAXYR <= 2007 AND \$CONDITIONS" \
-                "${SQOOP_OPTIONS_SPLIT[@]}"
-
-            sqoop job -libjars /tmp/bindir/ \
-                --create ${TABLE}_PART2 -- import \
-                "${SQOOP_OPTIONS_MAIN[@]}" \
-                --query "SELECT * FROM IASWORLD.${TABLE} WHERE TAXYR BETWEEN 2008 AND 2015 AND \$CONDITIONS" \
-                "${SQOOP_OPTIONS_SPLIT[@]}"
-
-            sqoop job -libjars /tmp/bindir/ \
-                --create ${TABLE}_PART3 -- import \
-                "${SQOOP_OPTIONS_MAIN[@]}" \
-                --query "SELECT * FROM IASWORLD.${TABLE} WHERE TAXYR >= 2016 AND \$CONDITIONS" \
                 "${SQOOP_OPTIONS_SPLIT[@]}"
 
         elif [[ ${CONTAINS_TAXYR} == TRUE ]]; then
 
             sqoop "${SQOOP_OPTIONS_JOB[@]}" \
                 "${SQOOP_OPTIONS_MAIN[@]}" \
-                --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
                 "${SQOOP_OPTIONS_SPLIT[@]}"
 
         else
 
             sqoop "${SQOOP_OPTIONS_JOB[@]}" \
                 "${SQOOP_OPTIONS_MAIN[@]}" \
-                --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
                 -m 1
 
         fi
