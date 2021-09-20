@@ -17,12 +17,21 @@ x-default: &node
     - IPTS_USERNAME
   secrets:
     - IPTS_PASSWORD
+  networks:
+    - hadoopnet
 
 services:
   sqoop-node-master:
     <<: *node
     container_name: sqoop-node-master
     command: /bin/bash /scripts/create_jobs.sh
+
+networks:
+  hadoopnet:
+    ipam:
+      config:
+        - subnet: 211.54.0.0/16
+    name: hadoopnet
 
 secrets:
   IPTS_PASSWORD:
