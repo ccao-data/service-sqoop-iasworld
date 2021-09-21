@@ -28,7 +28,8 @@ aws s3 sync \
 aws s3 mv \
     target/ \
     ${BUCKET_URI}/iasworld/data \
-    --exclude "*gitkeep" \
+    --exclude "*" \
+    --include "*.parquet" \
     --recursive \
     | tee -a ${TEMP_LOG_FILE}
 
