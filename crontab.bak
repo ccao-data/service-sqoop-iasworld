@@ -1,0 +1,2 @@
+# Runs iasWorld data >> AWS S3 dump script at 1 AM each day
+0 1 * * * cd /home/shiny-server/services/service_sqoop_iasworld && /bin/bash ./run.sh
