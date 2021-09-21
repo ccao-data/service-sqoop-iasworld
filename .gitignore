@@ -4,4 +4,4 @@ secrets/
 target/
 metastore/
 logs/
-archive/
+backup/
