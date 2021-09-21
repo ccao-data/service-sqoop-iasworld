@@ -15,8 +15,8 @@ for TABLE in ${JOB_TABLES}; do
 
     # Execute saved sqoop job
     sqoop job -libjars /tmp/bindir/ \
-        -D java.security.egd=file:/dev/../dev/urandom \
-        -D mapred.child.java.opts="-Djava.security.egd=file:/dev/../dev/urandom" \
+        -D java.security.egd=file:///dev/./urandom \
+        -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
         --exec ${TABLE}
 
     # Copy from distributed file system (HDFS) to local mounted dir,

@@ -35,8 +35,8 @@ for TABLE in ${JOB_TABLES}; do
         # Options passed to sqoop
         SQOOP_OPTIONS_JOB=(
             job -libjars /tmp/bindir/ \
-            -D java.security.egd=file:/dev/../dev/urandom \
-            -D mapred.child.java.opts="-Djava.security.egd=file:/dev/../dev/urandom" \
+            -D java.security.egd=file:///dev/./urandom \
+            -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
             --create ${TABLE} -- import \
             --target-dir /user/root/target/${TABLE} \
             --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS"
