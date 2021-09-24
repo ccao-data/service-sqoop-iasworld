@@ -16,15 +16,11 @@ This repository contains the dependencies and scripts necessary to run [`sqoop`]
 
 ### Files
 
-#### Build
-
 Files needed only for building the Docker container/dependencies.
 
 - `build.sh` - Convenience script to run the Dockercommands that will build the `sqoop` container
 - `build-sqoop.Dockerfile` - Dockerfile to build `sqoop` from scratch if unavailable via the GitLab container registry
 - `build-native-hadoop.Dockerfile` - Dockerfile to build Hadoop from scratch, which is a dependency for `sqoop`. `build-sqoop.Dockerfile` depends on this Dockerfile being run first
-
-#### Run
 
 Files needed only at runtime after the Docker container is built.
 
@@ -36,9 +32,15 @@ Files needed only at runtime after the Docker container is built.
 - `create-jobs.yaml` - Defines the container needed to create `sqoop` jobs. Outputs job definitions to `metastore/`
 - `run-jobs.yaml` - Defines the containers and environment needed to run `sqoop` jobs in a small, pseudo-distributed Hadoop cluster. Pulls from `metastore/` and outputs to `target/` 
 - `.env` - Contains DB connection details. Alter before running to provide your own details
-- `crontab.bak` - [Cron](https://www.adminschoice.com/crontab-quick-reference) backup file that specifies schedule on which to execute `run.sh`. Installed with `echo crontab.back > sudo crontab`
+- `crontab.bak` - [Cron](https://www.adminschoice.com/crontab-quick-reference) backup file that specifies schedule on which to execute `run.sh`. Install with `echo crontab.back > sudo crontab`
 
-## Alternate Usage
+## Usage
+
+### Export All Tables
+
+By default, running the `run.sh` script will export _all_ tables in iasWorld to `target/`. Subsequent runs will export any rows created or updated since the last run.
+
+The `run.sh` script is scheduled to run via cron every night at 1 AM.
 
 ### Export A Single Table 
 
@@ -53,7 +55,7 @@ You can query a single table by adding an environmental variable named `IPTS_TAB
 ...
 ```
 
-### Managing Sqoop Jobs
+### Manage Sqoop Jobs
 
 Sometimes you may need to manually delete or update `sqoop` jobs. To do so, you'll need to create a shell inside the `sqoop` Docker container. You can do this by running the following bash command:
 
@@ -68,28 +70,36 @@ sqoop job --list
 sqoop job --delete ASMT_ALL
 ```
 
-### Restoring From Backup
-
-Occasionally, 
-
-### Issues With `ASMT_ALL`
-
-The `ASMT_ALL` table is fairly large (120+ million rows). As a result, queries against it can sometimes time out. 
-
-To solve this, we can edit the `ASMT_ALL` query directly to only search for new `IASW_ID` rows _after 2020_, instead of all years.
-
-Open `metastore/metastore.db.script` using a text editor and change the `ASMT_ALL` query from:
-
-```sql
-SELECT * FROM IASWORLD.ASMT_ALL WHERE $CONDITIONS
-```
-
-To the following:
-
-```sql
-SELECT * FROM IASWORLD.ASMT_ALL WHERE TAXYR >= 2020 AND $CONDITIONS
-```
-
 ## Useful Resources
 
+Below is a list of references used to create this repository.
 
+### Documentation and Guides
+
+- [Sqoop User Guide v1.4.7](https://sqoop.apache.org/docs/1.4.7/SqoopUserGuide.html)
+- [Hadoop Cluster Setup Guide](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/ClusterSetup.html)
+- [How to install and setup a 3-node Hadoop cluster](https://www.linode.com/docs/guides/how-to-install-and-set-up-hadoop-cluster/)
+- [Setup a distributed Hadoop cluster with Docker](https://blog.newnius.com/setup-distributed-hadoop-cluster-with-docker-step-by-step.html)
+- [Tips for Docker/Hadoop cluster setup](https://medium.com/@rubenafo/some-tips-to-run-a-multi-node-hadoop-in-docker-9c7012dd4e26)
+
+### Docker Resources
+
+- [Sqoop Docker image](https://github.com/dvoros/docker-sqoop)
+- [Hadoop Docker image](https://github.com/dvoros/hadoop-docker) - Sqoop image uses this as a dependency
+- [Hadoop cluster Docker image](https://github.com/rancavil/hadoop-single-node-cluster) - Useful setup and options for pseudo-distributed Hadoop
+
+### Debugging
+
+- [SO post on `--bindir` sqoop option](https://stackoverflow.com/questions/21599785/sqoop-not-able-to-import-table)
+- [SO post on `--map-column-java` option](https://stackoverflow.com/questions/32537148/sqoop-export-from-hdfs-to-oracle-error)
+- [On generating strings for `--map-column-java` using shell and awk](https://stackoverflow.com/questions/45052340/how-to-use-sqoop-import-command-with-map-column-hive/45053915#45053915)
+- [Post on java security options that cause `Connection reset` errors](https://blog.pythian.com/connection-resets-when-importing-from-oracle-with-sqoop/)
+- [Data nodes not connected/listed by Hadoop](https://stackoverflow.com/questions/29910805/namenode-datanode-not-list-by-using-jps)
+- [Oracle JDBC connection issues](https://stackoverflow.com/questions/2327220/oracle-jdbc-intermittent-connection-issue)
+
+### Data Type Mappings (used to populate `--map-column-java`
+
+NOTE: Most `sqoop` import errors are caused by incorrect output data types. Types specified by `--map-column-java` must be compatible with the data type in SQL, otherwise you may get numeric overflows or string exceptions.
+
+- [Java to Oracle Type Mapping Matrix](https://docs.oracle.com/cd/E19501-01/819-3659/gcmaz/)
+- [PL/SQL (Oracle SQL) to JDBC mapping](https://docs.oracle.com/cd/B19306_01/java.102/b14188/datamap.htm#CHDBJAGH) - Not applicable here but still helpful
