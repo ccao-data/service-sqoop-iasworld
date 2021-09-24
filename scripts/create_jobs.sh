@@ -35,6 +35,7 @@ for TABLE in ${JOB_TABLES}; do
         # Options passed to sqoop
         SQOOP_OPTIONS_JOB=(
             job -libjars /tmp/bindir/ \
+            -D oracle.sessionTimeZone=America/Chicago \
             -D java.security.egd=file:///dev/./urandom \
             -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
             --create ${TABLE} -- import \
@@ -48,9 +49,9 @@ for TABLE in ${JOB_TABLES}; do
             --username ${IPTS_USERNAME} \
             --password-file file:///run/secrets/IPTS_PASSWORD \
             --as-parquetfile \
-            --incremental append \
-            --check-column IASW_ID \
-            --last-value 0 \
+            --incremental lastmodified \
+            --check-column WEN \
+            --last-value '1900-01-01 00:00:00.0' \
             --map-column-java ${COLUMN_MAPPING}
         )
 
