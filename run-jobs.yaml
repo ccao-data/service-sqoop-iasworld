@@ -7,7 +7,7 @@ x-default: &node
     dockerfile: build-sqoop.Dockerfile
   image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
   volumes:
-    - ./drivers:/jdbc # fsdfsd
+    - ./drivers:/jdbc
     - ./scripts:/scripts
     - ./target:/tmp/target
     - ./metastore:/root/.sqoop
