@@ -70,26 +70,6 @@ sqoop job --list
 sqoop job --delete ASMT_ALL
 ```
 
-### Fix Sqoop Connection Errors 
-
-The iasWorld Oracle server is tempermental. Connections that are open without traffic for more than about 60 seconds will be terminated by the server. As a result, you may occasionally see this error:
-
-```
-Caused by: java.sql.SQLRecoverableException: IO Error: Connection reset by peer
-```
-
-This error indicates the server reset the JDBC connection because it was open for too long without traffic. Usually this happens when some mapreduce jobs finish before others. The easiest way to fix this is to edit the job definitions in `metastore/metastore.db.script` to only use one mapper. To do this, change the line for every table/job from:
-
-```sql
-INSERT INTO SQOOP_SESSIONS VALUES('TABLE_NAME_HERE','mapreduce.num.mappers','8','SqoopOptions')
-```
-
-To:
-
-```sql
-INSERT INTO SQOOP_SESSIONS VALUES('TABLE_NAME_HERE','mapreduce.num.mappers','1','SqoopOptions')
-```
-
 ## Useful Resources
 
 ### Documentation and Guides

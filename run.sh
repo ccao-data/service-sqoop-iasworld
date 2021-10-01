@@ -29,7 +29,7 @@ if [ ! -f metastore/metastore.db.script ]; then
     # Manually update job defs after first run using sed
     sed -i "s/'mapreduce.num.mappers','8'/'mapreduce.num.mappers','1'/g" \
         metastore/metastore.db.script
-    sed -i "s/WEN IS NULL AND //g" \
+    sed -i "s/WEN IS NULL OR //g" \
         metastore/metastore.db.script
     sed -i "/db.query.boundary/d" \
         metastore/metastore.db.script
