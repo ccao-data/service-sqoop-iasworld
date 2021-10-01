@@ -5,22 +5,44 @@ TEMP_LOG_FILE="logs/temp-sqoop-log"
 BUCKET_URI="s3://ccao-landing-us-east-1"
 LOG_GROUP_NAME="/ccao/jobs/sqoop"
 
-# Create sqoop jobs. These are saved in the metastore/ directory
-# and synced to S3 on job completion
-/usr/local/bin/docker-compose \
-    -f create-jobs.yaml up \
-    --remove-orphans \
-    --no-color \
-    | ts '%.s' \
-    | tee ${TEMP_LOG_FILE}
+# Create sqoop jobs if none exist, run big import once, then
+# change future jobs to:
+# - Grab only rows with non-null WEN that have been created since last run
+# - Use only a single mapper (lower chance of failure for small jobs)
+#
+# Job definitions are saved to the metastore/ directory and synced with S3
+if [ ! -f metastore/metastore.db.script ]; then
+    /usr/local/bin/docker-compose \
+        -f create-jobs.yaml up \
+        --remove-orphans \
+        --no-color \
+        | ts '%.s' \
+        | tee ${TEMP_LOG_FILE}
 
-# Run all sqoop jobs. Parquet files are output to target/ directory
-/usr/local/bin/docker-compose \
-    -f run-jobs.yaml up --abort-on-container-exit \
-    --remove-orphans \
-    --no-color \
-    | ts '%.s' \
-    | tee -a ${TEMP_LOG_FILE}
+    /usr/local/bin/docker-compose \
+        -f run-jobs.yaml up --abort-on-container-exit \
+        --remove-orphans \
+        --no-color \
+        | ts '%.s' \
+        | tee -a ${TEMP_LOG_FILE}
+
+    # Manually update job defs after first run using sed
+    sed -i "s/'mapreduce.num.mappers','8'/'mapreduce.num.mappers','1'/g" \
+        metastore/metastore.db.script
+    sed -i "s/WEN IS NULL AND //g" \
+        metastore/metastore.db.script
+    sed -i "/db.query.boundary/d" \
+        metastore/metastore.db.script
+else
+    # If jobs already exist, run all incremental sqoop jobs
+    # Resulting parquet files are output to the target/ directory
+    /usr/local/bin/docker-compose \
+        -f run-jobs.yaml up --abort-on-container-exit \
+        --remove-orphans \
+        --no-color \
+        | ts '%.s' \
+        | tee -a ${TEMP_LOG_FILE}
+fi
 
 # Sync metastore/ directory to S3
 # Need to keep a local copy in order to save state

@@ -40,7 +40,7 @@ for TABLE in ${JOB_TABLES}; do
             -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
             --create ${TABLE} -- import \
             --target-dir /user/root/target/${TABLE} \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS"
+            --query "SELECT * FROM IASWORLD.${TABLE} WHERE WEN IS NULL AND \$CONDITIONS"
         )
 
         SQOOP_OPTIONS_MAIN=(
