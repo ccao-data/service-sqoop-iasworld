@@ -40,7 +40,7 @@ for TABLE in ${JOB_TABLES}; do
             -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
             --create ${TABLE} -- import \
             --target-dir /user/root/target/${TABLE} \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE WEN IS NULL OR \$CONDITIONS"
+            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS"
         )
 
         SQOOP_OPTIONS_MAIN=(
@@ -49,16 +49,12 @@ for TABLE in ${JOB_TABLES}; do
             --username ${IPTS_USERNAME} \
             --password-file file:///run/secrets/IPTS_PASSWORD \
             --as-parquetfile \
-            --incremental lastmodified \
-            --check-column WEN \
-            --last-value '1900-01-01 00:00:00.0' \
             --map-column-java ${COLUMN_MAPPING}
         )
 
         SQOOP_OPTIONS_SPLIT=(
             --split-by TAXYR \
-            --num-mappers 8 \
-            --boundary-query "SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}"
+            --num-mappers 8
         )
 
         # Create a sqoop job for the selected table(s). Saves to a metastore in
