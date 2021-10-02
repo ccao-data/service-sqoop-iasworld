@@ -1,0 +1,12 @@
+<configuration>
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:derby:metastore_db;create=true</value>
+        <description>JDBC connect string for Derby metastore</description>
+    </property>
+    <property>
+        <name>datanucleus.autoCreateSchema</name>
+        <value>false</value>
+        <description>Creates necessary schema on a startup if one doesn't exist</description>
+    </property>
+</configuration>

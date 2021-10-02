@@ -105,6 +105,30 @@ RUN mkdir -p /tmp/bindir /tmp/target && \
     chmod +x ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
     chown root:root ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 
+# Download and install Apache Hive
+ARG HIVE_VER=3.1.2
+ENV HIVE_HOME /usr/local/hive/apache-hive-${HIVE_VER}-bin
+ENV PATH ${PATH}:/usr/local/hive/apache-hive-${HIVE_VER}-bin/bin
+ENV CLASSPATH $CLASSPATH:/usr/local/hadoop/lib/*:.
+ENV CLASSPATH $CLASSPATH:/usr/local/hive/lib/*:.
+RUN mkdir -p /usr/local/hive && \
+    curl -s https://dlcdn.apache.org/hive/hive-${HIVE_VER}/apache-hive-${HIVE_VER}-bin.tar.gz \
+    | tar -xz -C /usr/local/hive
+
+# Download and install Apache Derby to use as a local metastore
+ARG DERBY_VER=10.4.2.0
+ENV DERBY_HOME /usr/local/derby
+ENV CLASSPATH $CLASSPATH:$DERBY_HOME/db-derby-$DERBY_VER/lib/derby.jar
+ENV CLASSPATH $CLASSPATH:$DERBY_HOME/db-derby-$DERBY_VER/lib/derbytools.jar
+RUN mkdir -p /usr/local/derby && \
+    curl -s http://archive.apache.org/dist/db/derby/db-derby-${DERBY_VER}/db-derby-${DERBY_VER}-bin.tar.gz \ 
+    | tar -xz -C /usr/local/derby && \
+    mkdir -p ${DERBY_HOME}/data
+
+# Configure the Hive metastore
+COPY docker-config/hive/hive-site.xml ${HIVE_HOME}/conf/
+COPY docker-config/hive/hive-schema-3.1.0.derby.sql ${HIVE_HOME}/scripts/metastore/upgrade/derby/
+
 # Entrypoint/startup for sqoop
 COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 
 COPY docker-config/bootstrap.sh docker-config/entrypoint.sh /etc/docker-config/
