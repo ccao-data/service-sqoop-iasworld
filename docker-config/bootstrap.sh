@@ -5,14 +5,13 @@ $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 # Clear HDFS datanode storage location
 rm -rf /tmp/hadoop/dataNode/*
 
-# Remove ssh keys from data nodes and wait for namenode to activate
+# Remove ssh keys from data nodes
 if [[ $HOSTNAME != $MASTER_HOSTNAME ]]; then
     rm /root/.ssh/id_ed25519
 fi
 
 # Remove annoying warnings about dependencies
 export ACCUMULO_HOME=/tmp
-export HCAT_HOME=/tmp
 export ZOOKEEPER_HOME=/tmp
 export HBASE_HOME=/tmp
 

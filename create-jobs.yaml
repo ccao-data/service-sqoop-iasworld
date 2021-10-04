@@ -15,6 +15,7 @@ x-default: &node
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
+    - IPTS_TABLE=ADDRINDX
   secrets:
     - IPTS_PASSWORD
   networks:

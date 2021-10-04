@@ -39,8 +39,10 @@ for TABLE in ${JOB_TABLES}; do
             -D java.security.egd=file:///dev/./urandom \
             -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
             --create ${TABLE} -- import \
-            --target-dir /user/root/target/${TABLE} \
-            --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS"
+            --hcatalog-table ${TABLE} \
+            --hive-home ${HIVE_HOME} \
+            --create-hcatalog-table \
+            --table ${TABLE}
         )
 
         SQOOP_OPTIONS_MAIN=(
@@ -48,8 +50,6 @@ for TABLE in ${JOB_TABLES}; do
             --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
             --username ${IPTS_USERNAME} \
             --password-file file:///run/secrets/IPTS_PASSWORD \
-            --as-parquetfile \
-            --map-column-java ${COLUMN_MAPPING}
         )
 
         SQOOP_OPTIONS_SPLIT=(
