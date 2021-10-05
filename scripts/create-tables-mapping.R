@@ -1,7 +1,9 @@
 # Script to generate manually mappings for data types in iasWorld
-# Maps from Oracle data types to java data types for use with sqoop/parquet
+# Maps from Oracle data types to HCatalog data types
+# for use with sqoop/parquet/hive
 # See: https://docs.oracle.com/cd/E15817_01/server.111/b31055/adabas_datatype_conv.htm
 # https://docs.oracle.com/cd/E19501-01/819-3659/gcmaz/
+# https://cwiki.apache.org/confluence/display/Hive/HCatalog+InputOutput#HCatRecord
 library(arrow)
 library(RJDBC)
 library(readr)
@@ -28,7 +30,8 @@ tables <- dbGetQuery(
     COLUMN_NAME,
     DATA_TYPE,
     DATA_PRECISION,
-    DATA_SCALE
+    DATA_SCALE,
+    COLUMN_ID
   FROM ALL_TAB_COLUMNS
   WHERE OWNER = 'IASWORLD'
   AND TABLE_NAME NOT IN (
@@ -40,12 +43,12 @@ tables <- dbGetQuery(
 )
 
 # Manually mapped columns based on sampling of NUMBER (no precision/scale) cols
-addl_float_cols <- c(
+addl_double_cols <- c(
   "BRATE", "COMVALPERUNIT", "ODECR", "OINCR", "ORATE", "OSIZE",
   "OVRVALAPR1", "OVRVALAPR2", "OVRVALAPR3", "R1", "R2"
 )
 
-addl_long_cols <- c(
+addl_bigint_cols <- c(
   "BINCR", "BSIZE", "CONST1", "IASW_ID", "NOTICVAL", "OVRVAL04", "OVRVAL11",
   "OVRVAL13", "OVRVAL50", "OVRVAL51", "OVRVAL55", "OVRVAL57", "OVRVALASM1",
   "OVRVALASM2", "OVRVALASM3", "R3", "STAMPVAL", "TOT01", "TOT02", "TOT03",
@@ -68,18 +71,18 @@ addl_long_cols <- c(
 )
 
 tables <- tables %>%
-  mutate(JAVA_TYPE = case_when(
+  mutate(HCAT_TYPE = case_when(
     DATA_TYPE == "CLOB" ~ "string",
     DATA_TYPE == "VARCHAR2" ~ "string",
     DATA_TYPE == "DATE" ~ "string",
     DATA_TYPE == "NUMBER" & DATA_PRECISION <= 10 & (DATA_SCALE == 0 | is.na(DATA_SCALE)) ~ "bigint",
     DATA_TYPE == "NUMBER" & (DATA_PRECISION > 10 | DATA_SCALE > 0) ~ "double",
-    DATA_TYPE == "NUMBER" & is.na(DATA_PRECISION) & COLUMN_NAME %in% addl_float_cols ~ "double",
-    DATA_TYPE == "NUMBER" & is.na(DATA_PRECISION) & COLUMN_NAME %in% addl_long_cols ~ "bigint",
+    DATA_TYPE == "NUMBER" & is.na(DATA_PRECISION) & COLUMN_NAME %in% addl_double_cols ~ "double",
+    DATA_TYPE == "NUMBER" & is.na(DATA_PRECISION) & COLUMN_NAME %in% addl_bigint_cols ~ "bigint",
     DATA_TYPE == "NUMBER" & is.na(DATA_PRECISION) ~ "bigint"
   )) %>%
-  arrange(TABLE_NAME) %>%
-  select(-DATA_SCALE)
+  arrange(TABLE_NAME, COLUMN_ID) %>%
+  select(-COLUMN_ID)
 
 write_csv(tables, "tables-mapping.csv", quote = "none")
 

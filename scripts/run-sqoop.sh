@@ -26,7 +26,7 @@ for TABLE in ${JOB_TABLES}; do
     COLUMN_MAPPINGS=$(awk -F"," \
         -v OFS=',' \
         -v table=${TABLE} \
-        '$1 == table {if( !($2=="TAXYR") ) print tolower($2)" "$5}' \
+        '$1 == table {if( !($2=="TAXYR") ) print tolower($2)" "$6}' \
         /scripts/tables-mapping.csv \
         | paste -sd,
     )
