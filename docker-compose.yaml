@@ -1,10 +1,9 @@
 version: '3.6'
 
-# Template for worker nodes
 x-default: &node
   build:
     context: .
-    dockerfile: build-sqoop.Dockerfile
+    dockerfile: Dockerfile
   image: service_sqoop_iasworld:latest
   volumes:
     - ./drivers:/jdbc
@@ -18,25 +17,20 @@ x-default: &node
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
-    - IPTS_TABLE=ADDRINDX
+    - IPTS_TABLE=PARDAT
   secrets:
     - IPTS_PASSWORD
   networks:
     - hadoopnet
 
-# Main master node service
 services:
   sqoop-node-master:
     <<: *node
     container_name: sqoop-node-master
     hostname: sqoop-node-master
-    command: /bin/bash /scripts/run_jobs.sh
-    ports:
-      - 9870:9870
-      - 9864:9864
-      - 8081:8080
-      - 8082:8088
-      - 8042:8042
+    command: >
+      /bin/bash -c "/scripts/wait-for-it.sh hive-metastore-server:9083 --
+                    /scripts/run-sqoop.sh"
 
   sqoop-node-2:
     <<: *node
@@ -58,6 +52,31 @@ services:
     command: tail -f /dev/null
     depends_on: 
       - sqoop-node-master
+
+  hive-metastore-postgresql:
+    container_name: hive-metastore-postgresql
+    hostname: hive-metastore-postgresql
+    image: postgres:9.5.3
+    volumes:
+      - ./docker-config/hive/:/docker-entrypoint-initdb.d/
+    networks:
+      - hadoopnet
+    depends_on: 
+      - sqoop-node-master
+
+  hive-metastore-server:
+    <<: *node
+    container_name: hive-metastore-server
+    hostname: hive-metastore-server
+    depends_on: 
+      - sqoop-node-master
+    environment:
+      - MASTER_HOSTNAME=sqoop-node-master
+      - SKIP_BOOTSTRAP=1
+    command: >
+      /bin/bash -c "/scripts/wait-for-it.sh hive-metastore-postgresql:5432 --
+                    schematool -initSchema -dbType postgres
+                    hive --service metastore"
 
 networks:
   hadoopnet:

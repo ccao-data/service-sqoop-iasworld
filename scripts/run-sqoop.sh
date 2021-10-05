@@ -7,7 +7,12 @@ else
     JOB_TABLES=${IPTS_TABLE}
 fi
 
-hcat -e "create database iasworld;"
+# Weird workaround required for dir not found error
+hdfs dfs -mkdir -p /user/root/
+
+# Create database in HDFS to store tables in
+DB_NAME=iasworld
+hcat -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};"
 
 echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
@@ -15,13 +20,11 @@ for TABLE in ${JOB_TABLES}; do
     if sqoop job --list | grep -q ${TABLE}; then
         echo "WARNING: A sqoop job already exists for table: ${TABLE}"
     else
-        # Get java data type mappings from file and pass them to sqoop as
-        # a comma-separated list in the format COLUMN=Type. This ensures that
-        # the output for each column is the expected type
-        COLUMN_MAPPING=$(awk -F"," \
+        # Get column names to create hive table
+        COLUMN_MAPPINGS=$(awk -F"," \
             -v OFS=',' \
             -v table=${TABLE} \
-            '$1 == table {print $2"="$5}' \
+            '$1 == table {if( !($2=="TAXYR") ) print tolower($2)" "$5}' \
             /scripts/tables-mapping.csv \
             | paste -sd,
         )
@@ -35,46 +38,55 @@ for TABLE in ${JOB_TABLES}; do
         )
 
         # Options passed to sqoop
-        SQOOP_OPTIONS_JOB=(
+        SQOOP_OPTIONS_MAIN=(
             job -libjars /tmp/bindir/ \
             -D oracle.sessionTimeZone=America/Chicago \
-            -D java.security.egd=file:///dev/./urandom \
-            -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
             --create ${TABLE} -- import \
-            --table IASWORLD.${TABLE} \
-            --hcatalog-database iasworld \
-            --hcatalog-table ${TABLE} \
-            --hcatalog-storage-stanza 'stored as parquet' \
-            --drop-and-create-hcatalog-table \
-            --compress \
-            --compression-codec snappy
-        )
-
-        SQOOP_OPTIONS_MAIN=(
             --bindir /tmp/bindir/ \
             --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
             --username ${IPTS_USERNAME} \
             --password-file file:///run/secrets/IPTS_PASSWORD \
-        )
-
-        SQOOP_OPTIONS_SPLIT=(
-            --split-by TAXYR \
-            --num-mappers 8
+            --table IASWORLD.${TABLE} \
+            --hcatalog-database ${DB_NAME} \
+            --hcatalog-table ${TABLE} \
         )
 
         # Create a sqoop job for the selected table(s). Saves to a metastore in
         # /root/.sqoop, which is mounted to ./metastore via docker compose
         if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
+            hcat -e "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS})
+                     PARTITIONED BY (taxyr string) STORED AS PARQUET
+                     TBLPROPERTIES ('parquet.compression'='SNAPPY');"
+
             # For all tables with TAXYR column, create a job split by TAXYR
-            sqoop "${SQOOP_OPTIONS_JOB[@]}" \
-                "${SQOOP_OPTIONS_MAIN[@]}" \
-                "${SQOOP_OPTIONS_SPLIT[@]}"
+            sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
+                --split-by TAXYR \
+                --num-mappers 8
         else
             # For tables with no TAXYR column, just make a job with no split
-            sqoop "${SQOOP_OPTIONS_JOB[@]}" \
-                "${SQOOP_OPTIONS_MAIN[@]}" \
+            sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
                 -m 1
         fi
         echo "Created job for table: ${TABLE}"
     fi
+done
+
+echo "Running jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
+for TABLE in ${JOB_TABLES}; do
+
+    # Execute saved sqoop job
+    sqoop job -libjars /tmp/bindir/ \
+        --exec ${TABLE}
+
+    # Copy from distributed file system (HDFS) to local mounted dir
+    TABLE_LC=$(echo ${TABLE} | awk '{print tolower($0)}')
+    hdfs dfs -copyToLocal /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC} /tmp/target
+    hdfs dfs -rm -r -f /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}
+
+    # Remove _SUCCESS files and rename parts to parquet
+    find /tmp/target/${TABLE_LC} -type f -name '_SUCCESS' -delete
+    find /tmp/target/${TABLE_LC} -type f -name 'part-m-*' \
+        -exec mv {} {}.snappy.parquet \;
+
+    echo "Completed job for table: ${TABLE}"
 done

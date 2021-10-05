@@ -107,6 +107,7 @@ RUN mkdir -p /usr/local/hive && \
     curl -s https://dlcdn.apache.org/hive/hive-${HIVE_VER}/apache-hive-${HIVE_VER}-bin.tar.gz \
     | tar -xz -C /usr/local/hive && \
     rm ${HIVE_HOME}/lib/log4j-slf4j-impl-2.10.0.jar
+COPY docker-config/hive/hive-site.xml ${HIVE_CONF_DIR}
 
 # Install the postgresql connector driver
 ARG PSQL_JDBC_VER=42.2.24
@@ -115,7 +116,6 @@ RUN curl -o /usr/share/java/postgresql-jdbc.jar https://jdbc.postgresql.org/down
     ln -s /usr/share/java/postgresql-jdbc.jar ${HIVE_HOME}/lib/postgresql-jdbc.jar
 
 # Entrypoint/startup for sqoop and hive
-COPY docker-config/hive/hive-site.xml ${HIVE_CONF_DIR}
 COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 
 COPY docker-config/bootstrap.sh docker-config/entrypoint.sh /etc/docker-config/
 RUN chown -R root:root /etc/docker-config/ && \
