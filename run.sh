@@ -1,4 +1,5 @@
 #!/bin/bash
+START_TIME=`date +%s`
 
 # Env variables controlling where sqooped data is exported to
 TEMP_LOG_FILE="logs/temp-sqoop-log"
@@ -29,6 +30,15 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
 
 # Delete any remaining empty dirs
 find target/ -type d -empty -delete
+
+# Print overall runtime stats and tables extracted
+END_TIME=`date +%s`
+RUNTIME=$((END_TIME-START_TIME))
+hours=$((RUNTIME / 3600))
+minutes=$(( (RUNTIME % 3600) / 60 ))
+seconds=$(( (RUNTIME % 3600) % 60 ))
+echo "Total extraction time: ${hours}:${minutes}:${seconds} (hh:mm:ss)" \
+    | tee -a ${TEMP_LOG_FILE}
 
 # Convert text output from Docker and AWS CLI to clean JSON
 # for upload to AWS CloudWatch

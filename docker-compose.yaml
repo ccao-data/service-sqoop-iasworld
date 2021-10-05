@@ -9,7 +9,6 @@ x-default: &node
     - ./drivers:/jdbc
     - ./scripts:/scripts
     - ./target:/tmp/target
-    - ./metastore:/root/.sqoop
   environment:
     - MASTER_HOSTNAME=sqoop-node-master
     - NODE_HOSTNAMES=sqoop-node-2 sqoop-node-3 sqoop-node-4
@@ -17,7 +16,7 @@ x-default: &node
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
-    - IPTS_TABLE=PARDAT
+    - IPTS_TABLE=ADDN
   secrets:
     - IPTS_PASSWORD
   networks:
