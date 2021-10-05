@@ -3,7 +3,7 @@ version: '3.6'
 x-default: &node
   build:
     context: .
-    dockerfile: build-sqoop.Dockerfile
+    dockerfile: Dockerfile
   image: service_sqoop_iasworld:latest
   volumes:
     - ./drivers:/jdbc
@@ -22,10 +22,33 @@ x-default: &node
     - hadoopnet
 
 services:
+  hive-metastore-postgresql:
+    container_name: hive-metastore-postgresql
+    image: postgres:9.5.3
+    volumes:
+      - ./docker-config/hive/:/docker-entrypoint-initdb.d/
+    networks:
+      - hadoopnet
+  hive-metastore-server:
+    <<: *node
+    container_name: hive-metastore-server
+    hostname: hive-metastore-server
+    depends_on: 
+      - hive-metastore-postgresql 
+    environment:
+      - MASTER_HOSTNAME=sqoop-node-master
+      - SKIP_BOOTSTRAP=1
+    command: >
+      /bin/bash -c "sleep 5
+                    schematool -initSchema -dbType postgres
+                    hive --service metastore"
+
   sqoop-node-master:
     <<: *node
     container_name: sqoop-node-master
-    command: /bin/bash /scripts/create_jobs.sh
+    hostname: sqoop-node-master
+    command: tail -f /dev/null
+    #command: /bin/bash /scripts/create_jobs.sh
 
 networks:
   hadoopnet:

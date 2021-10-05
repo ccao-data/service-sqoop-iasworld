@@ -70,6 +70,12 @@ sqoop job --list
 sqoop job --delete ASMT_ALL
 ```
 
+## Crontab
+
+```
+0 6 * * * cd /home/shiny-server/services/service_sqoop_iasworld && /bin/bash ./run.sh
+```
+
 ## Useful Resources
 
 ### Documentation and Guides

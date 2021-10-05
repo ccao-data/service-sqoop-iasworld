@@ -7,6 +7,8 @@ else
     JOB_TABLES=${IPTS_TABLE}
 fi
 
+hcat -e "create database iasworld;"
+
 echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
     # Check to see if sqoop job already exists
@@ -39,10 +41,13 @@ for TABLE in ${JOB_TABLES}; do
             -D java.security.egd=file:///dev/./urandom \
             -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
             --create ${TABLE} -- import \
+            --table IASWORLD.${TABLE} \
+            --hcatalog-database iasworld \
             --hcatalog-table ${TABLE} \
-            --hive-home ${HIVE_HOME} \
-            --create-hcatalog-table \
-            --table ${TABLE}
+            --hcatalog-storage-stanza 'stored as parquet' \
+            --drop-and-create-hcatalog-table \
+            --compress \
+            --compression-codec snappy
         )
 
         SQOOP_OPTIONS_MAIN=(

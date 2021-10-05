@@ -1,7 +1,24 @@
 <configuration>
     <property>
-        <name>javax.jdo.option.ConnectionURL</name>
-        <value>jdbc:derby:;databaseName=/usr/local/derby/metastore_db;create=true</value>
-        <description>JDBC connect string for a JDBC metastore</description>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:postgresql://hive-metastore-postgresql/iasworld</value>
+        <description>PostgreSQL JDBC driver connection URL</description>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>org.postgresql.Driver</value>
+        <description>PostgreSQL metastore driver class name</description>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>hive</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>hive</value>
+    </property>
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://hive-metastore-server:9083</value>
     </property>
 </configuration>
