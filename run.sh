@@ -20,7 +20,7 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
 # # Move target/ directory to staging S3
 /usr/bin/aws s3 mv \
     target/ \
-    ${BUCKET_URI}/iasworld/target \
+    ${BUCKET_URI}/iasworld \
     --exclude "*" \
     --include "*.parquet" \
     --recursive \
@@ -29,15 +29,20 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
     | tee -a ${TEMP_LOG_FILE}
 
 # Delete any remaining empty dirs
+TABLES_EXTRACTED=$(ls target/)
 find target/ -type d -empty -delete
 
 # Print overall runtime stats and tables extracted
 END_TIME=`date +%s`
 RUNTIME=$((END_TIME-START_TIME))
-hours=$((RUNTIME / 3600))
-minutes=$(( (RUNTIME % 3600) / 60 ))
-seconds=$(( (RUNTIME % 3600) % 60 ))
-echo "Total extraction time: ${hours}:${minutes}:${seconds} (hh:mm:ss)" \
+HH=$((RUNTIME / 3600))
+MM=$(( (RUNTIME % 3600) / 60 ))
+SS=$(( (RUNTIME % 3600) % 60 ))
+echo "Tables extracted: ${TABLES_EXTRACTED}" \
+    | ts '%.s' \
+    | tee -a ${TEMP_LOG_FILE}
+echo "Total extraction time: ${HH}:${MM}:${SS} (hh:mm:ss)" \
+    | ts '%.s' \
     | tee -a ${TEMP_LOG_FILE}
 
 # Convert text output from Docker and AWS CLI to clean JSON
@@ -56,15 +61,15 @@ cat ${TEMP_LOG_FILE} \
     > ${LOG_FILE}
 
 # Create log stream in CloudWatch with today's date
-# /usr/bin/aws logs create-log-stream \
-#     --log-group-name ${LOG_GROUP_NAME} \
-#     --log-stream-name ${LOG_STREAM_NAME}
+/usr/bin/aws logs create-log-stream \
+    --log-group-name ${LOG_GROUP_NAME} \
+    --log-stream-name ${LOG_STREAM_NAME}
 
-# # Upload logs to CloudWatch
-# /usr/bin/aws logs put-log-events \
-#     --log-group-name ${LOG_GROUP_NAME} \
-#     --log-stream-name ${LOG_STREAM_NAME} \
-#     --log-events file://${LOG_FILE}
+# Upload logs to CloudWatch
+/usr/bin/aws logs put-log-events \
+    --log-group-name ${LOG_GROUP_NAME} \
+    --log-stream-name ${LOG_STREAM_NAME} \
+    --log-events file://${LOG_FILE}
 
 # Remove temp files
 rm ${LOG_FILE} ${TEMP_LOG_FILE}

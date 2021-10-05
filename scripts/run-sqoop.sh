@@ -64,16 +64,19 @@ for TABLE in ${JOB_TABLES}; do
     if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
 
         # Create an hcatalog table to fill using sqoop, plus an additional
-        # bucketed table fill later via hive INSERT
+        # bucketed table fill later via hive INSERT if num_buckets > 1
         hcat -e \
             "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS})
              PARTITIONED BY (taxyr string)
-             STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');
-
-             CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
-             PARTITIONED BY (taxyr string)
-             CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
              STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
+
+        if [[ ${NUM_BUCKETS} -gt 1 ]]; then
+            hcat -e \
+                "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
+                 PARTITIONED BY (taxyr string)
+                 CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
+                 STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
+        fi
 
         # For all tables with TAXYR column, create a job split by TAXYR
         sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
@@ -83,54 +86,60 @@ for TABLE in ${JOB_TABLES}; do
         # If no TAXYR col, make hcatalog tables without partitions
         hcat -e \
             "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS})
-             STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');
-
-             CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
-             CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
              STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
+
+        if [[ ${NUM_BUCKETS} -gt 1 ]]; then
+            hcat -e \
+                "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
+                 CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
+                 STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
+        fi
 
         # For tables with no TAXYR column, just make a job with no split
         sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
             -m 1
     fi
-    echo "Created job for table: ${TABLE}"
-done
-
-echo "Running jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
-for TABLE in ${JOB_TABLES}; do
+    echo "Running job for table: ${TABLE}"
 
     # Execute saved sqoop job
     sqoop job -libjars /tmp/bindir/ \
         --exec ${TABLE}
 
-    # Rewrite output from sqoop to bucketed table
-    if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
+    # Enable dynamic partitioning in hive
+    hive -e \
+        "SET hive.exec.dynamic.partition=true;
+         SET hive.exec.dynamic.partition.mode=nonstrict;"
+
+    # If buckets are specified, rewrite output from sqoop to bucketed table
+    if [[ ${CONTAINS_TAXYR} == TRUE ]] && [[ ${NUM_BUCKETS} -gt 1 ]]; then
         hive -e \
-            "SET hive.exec.dynamic.partition=true;
-             SET hive.exec.dynamic.partition.mode=nonstrict;
-             INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
              PARTITION (taxyr) SELECT * FROM ${DB_NAME}.${TABLE_LC}"
-    else
+    elif [[ ${CONTAINS_TAXYR} == FALSE ]] && [[ ${NUM_BUCKETS} -gt 1 ]]; then
         hive -e \
-            "SET hive.exec.dynamic.partition=true;
-             SET hive.exec.dynamic.partition.mode=nonstrict;
-             INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
              SELECT * FROM ${DB_NAME}.${TABLE_LC}"
     fi
 
     # Copy from distributed file system (HDFS) to local mounted dir
     mkdir -p /tmp/target/${TABLE}
-    hdfs dfs -copyToLocal \
-        /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}_bucketed/* \
-        /tmp/target/${TABLE}
+    if [[ ${NUM_BUCKETS} -gt 1 ]]; then
+        hdfs dfs -copyToLocal \
+            /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}_bucketed/* \
+            /tmp/target/${TABLE}
+    else
+        hdfs dfs -copyToLocal \
+            /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}/* \
+            /tmp/target/${TABLE}
+    fi
 
     # Remove tables in HDFS once moved to local
-    hdfs dfs -rm -r -f /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}
     hdfs dfs -rm -r -f /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}_bucketed
+    hdfs dfs -rm -r -f /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}
 
     # Remove _SUCCESS files and rename parts to parquet
-    find /tmp/target/${TABLE_LC} -type f -name '_SUCCESS' -delete
-    find /tmp/target/${TABLE_LC} -type f -exec mv {} part_{}.snappy.parquet \;
+    find /tmp/target/${TABLE} -type f -name '_SUCCESS' -delete
+    find /tmp/target/${TABLE} -type f -exec mv {} {}.snappy.parquet \;
 
     echo "Completed job for table: ${TABLE}"
 done
