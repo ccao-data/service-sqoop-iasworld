@@ -1,4 +1,6 @@
 #!/bin/bash
+# Increase arg limit. Hadoop throws errors otherwise
+ulimit -S -s unlimited
 
 # Check if table env var exists from docker, if not, use all tables
 if [[ -z ${IPTS_TABLE} ]]; then
@@ -65,13 +67,13 @@ for TABLE in ${JOB_TABLES}; do
 
         # Create an hcatalog table to fill using sqoop, plus an additional
         # bucketed table fill later via hive INSERT if num_buckets > 1
-        hcat -e \
+        hive -e \
             "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS})
              PARTITIONED BY (taxyr string)
              STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
 
         if [[ ${NUM_BUCKETS} -gt 1 ]]; then
-            hcat -e \
+            hive -e \
                 "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
                  PARTITIONED BY (taxyr string)
                  CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
@@ -84,12 +86,12 @@ for TABLE in ${JOB_TABLES}; do
             --num-mappers 8
     else
         # If no TAXYR col, make hcatalog tables without partitions
-        hcat -e \
+        hive -e \
             "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS})
              STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
 
         if [[ ${NUM_BUCKETS} -gt 1 ]]; then
-            hcat -e \
+            hive -e \
                 "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
                  CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
                  STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"

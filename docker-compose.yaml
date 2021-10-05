@@ -16,7 +16,7 @@ x-default: &node
     - IPTS_PORT
     - IPTS_SERVICE_NAME
     - IPTS_USERNAME
-    - IPTS_TABLE=ADDRINDX CNAME SALES
+    - IPTS_TABLE=ADDRINDX CNAME SALES SPLCOM
   secrets:
     - IPTS_PASSWORD
   networks:

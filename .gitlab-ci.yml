@@ -23,33 +23,18 @@ build:
   only:
     - master
   script:
-    - docker pull $CI_REGISTRY_IMAGE:build-native-hadoop-cache || true
+    - docker pull $CI_REGISTRY_IMAGE:build-cache || true
     - >
       docker build
       --pull
-      --cache-from $CI_REGISTRY_IMAGE:build-native-hadoop-cache
-      --tag $CI_REGISTRY_IMAGE:build-native-hadoop-cache
-      --tag build-native-hadoop
-      -f build-native-hadoop.Dockerfile
-      . | tee -a build-native-hadoop.log
-    - docker push $CI_REGISTRY_IMAGE:build-native-hadoop-cache
-    - docker pull $CI_REGISTRY_IMAGE:build-sqoop-cache || true
-    - >
-      docker build
-      --pull
-      --cache-from $CI_REGISTRY_IMAGE:build-sqoop-cache
-      --tag $CI_REGISTRY_IMAGE:build-sqoop-cache
+      --cache-from $CI_REGISTRY_IMAGE:build-cache
+      --tag $CI_REGISTRY_IMAGE:build-cache
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-      -f build-sqoop.Dockerfile
-      . | tee -a build-sqoop.log
-    - docker push $CI_REGISTRY_IMAGE:build-sqoop-cache
+      --tag build-cache
+      .
+    - docker push $CI_REGISTRY_IMAGE:build-cache
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  artifacts:
-    when: always
-    expire_in: 1 day
-    paths:
-      - build-native-hadoop.log
-      - build-sqoop.log
+
 
 ### PUSH ###
 push:
