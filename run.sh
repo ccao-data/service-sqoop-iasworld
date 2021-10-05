@@ -17,7 +17,19 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
 # Cleanup after docker run
 /usr/local/bin/docker-compose rm -f -s -v
 
-# # Move target/ directory to staging S3
+# Drop existing keys on S3 for any pulled tables
+TABLES_EXTRACTED=$(ls target/)
+for TABLE in ${TABLE_EXTRACTED}; do
+    /usr/bin/aws s3 rm \
+        ${BUCKET_URI}/iasworld/${TABLE} \
+        --exclude "*" \
+        --include "*.parquet" \
+        --recursive \
+        | ts '%.s' \
+        | tee -a ${TEMP_LOG_FILE}
+done
+
+# Uploaded pulled files from local target/ dir to S3
 /usr/bin/aws s3 mv \
     target/ \
     ${BUCKET_URI}/iasworld \
@@ -28,8 +40,7 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
     | ts '%.s' \
     | tee -a ${TEMP_LOG_FILE}
 
-# Record which tables were pulled and delete any remaining empty dirs
-TABLES_EXTRACTED=$(ls target/ | paste -sd,)
+# Delete any remaining empty dirs
 find target/ -type d -empty -delete
 
 # Print overall runtime stats and tables extracted
