@@ -28,7 +28,7 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
     | ts '%.s' \
     | tee -a ${TEMP_LOG_FILE}
 
-# Delete any remaining empty dirs
+# Record which tables were pulled and delete any remaining empty dirs
 TABLES_EXTRACTED=$(ls target/ | paste -sd,)
 find target/ -type d -empty -delete
 

@@ -1,5 +1,4 @@
-# Multi-stage Dockerfile to build the dependencies required for Apache Sqoop
-# version 1.4.7 
+# Multi-stage Dockerfile to build the dependencies required for Sqoop and Hive
 
 ##### CREATE MAIN HADOOP IMAGE #####
 
@@ -47,10 +46,10 @@ RUN sed s/HOSTNAME/localhost/ \
     ${HADOOP_HOME}/etc/hadoop/core-site.xml.template \
     > ${HADOOP_HOME}/etc/hadoop/core-site.xml && \
     sed s/HOSTNAME/localhost/ \
-    $HADOOP_HOME/etc/hadoop/yarn-site.xml.template \
+    ${HADOOP_HOME}/etc/hadoop/yarn-site.xml.template \
     > /usr/local/hadoop/etc/hadoop/yarn-site.xml && \
     sed s/HOSTNAME/localhost/ \
-    $HADOOP_HOME/etc/hadoop/mapred-site.xml.template \
+    ${HADOOP_HOME}/etc/hadoop/mapred-site.xml.template \
     > /usr/local/hadoop/etc/hadoop/mapred-site.xml
 
 # ssh setup for node comms
@@ -100,7 +99,7 @@ RUN mkdir -p /tmp/bindir /tmp/target && \
 ARG HIVE_VER=3.1.2
 ENV HIVE_HOME /usr/local/hive/apache-hive-${HIVE_VER}-bin
 ENV HIVE_CONF_DIR ${HIVE_HOME}/conf
-ENV HCAT_HOME $HIVE_HOME/hcatalog
+ENV HCAT_HOME ${HIVE_HOME}/hcatalog
 ENV PATH ${PATH}:${HIVE_HOME}/bin
 ENV PATH ${PATH}:${HCAT_HOME}/bin
 RUN mkdir -p /usr/local/hive && \

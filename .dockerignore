@@ -5,6 +5,5 @@
 drivers/
 secrets/
 target/
-metastore/
 logs/
 backup/
