@@ -68,8 +68,7 @@ for TABLE in ${JOB_TABLES}; do
         # Create an hcatalog table to fill using sqoop, plus an additional
         # bucketed table fill later via hive INSERT if num_buckets > 1
         hive -e \
-            "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS})
-             PARTITIONED BY (taxyr string)
+            "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS}, taxyr string)
              STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
 
         if [[ ${NUM_BUCKETS} -gt 1 ]]; then
@@ -107,20 +106,19 @@ for TABLE in ${JOB_TABLES}; do
     sqoop job -libjars /tmp/bindir/ \
         --exec ${TABLE}
 
-    # Enable dynamic partitioning in hive
-    hive -e \
-        "SET hive.exec.dynamic.partition=true;
-         SET hive.exec.dynamic.partition.mode=nonstrict;"
-
     # If buckets are specified, rewrite output from sqoop to bucketed table
     if [[ ${CONTAINS_TAXYR} == TRUE ]] && [[ ${NUM_BUCKETS} -gt 1 ]]; then
         hive -e \
-            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
-             PARTITION (taxyr) SELECT * FROM ${DB_NAME}.${TABLE_LC}"
+            "SET hive.exec.dynamic.partition=true;
+             SET hive.exec.dynamic.partition.mode=nonstrict;
+             INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+             SELECT * FROM ${DB_NAME}.${TABLE_LC};"
     elif [[ ${CONTAINS_TAXYR} == FALSE ]] && [[ ${NUM_BUCKETS} -gt 1 ]]; then
         hive -e \
-            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
-             SELECT * FROM ${DB_NAME}.${TABLE_LC}"
+            "SET hive.exec.dynamic.partition=true;
+             SET hive.exec.dynamic.partition.mode=nonstrict;
+             INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+             SELECT * FROM ${DB_NAME}.${TABLE_LC};"
     fi
 
     # Copy from distributed file system (HDFS) to local mounted dir

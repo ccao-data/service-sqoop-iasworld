@@ -2,78 +2,64 @@
 
 This repository contains the dependencies and scripts necessary to run [`sqoop`](https://sqoop.apache.org/docs/1.4.7/SqoopUserGuide.html), a data extraction tool for transferring data from relational databases to Hadoop, Hive, or Parquet.
 
+In this case, `sqoop` is used to export full-table dumps from iasWorld, the CCAO's system of record, to an [HCatalog](https://cwiki.apache.org/confluence/display/Hive/HCatalog). The result is a set of partitioned and bucketed Parquet files which can be uploaded to [AWS S3](https://aws.amazon.com/s3/) and queried directly via [AWS Athena](https://aws.amazon.com/athena).
+
 ## Structure 
 
 ### Directories 
 
-- `docker-config/` - Configuration and setup files for Hadoop backend. Used during Docker build only
+- `docker-config/` - Configuration and setup files for the Hadoop/Hive backend. Used during Docker build only
 - `drivers/` - Mounted during run to provide connection drivers to `sqoop`. Put OJDBC files here (`ojdbc8.jar` or `ojdbc7.jar`)
-- `logs/` - Location of saved log files from each run. Logs are in the format `(ISO 8601 timestamp)-sqoop-log.txt` and compressed to [`.zst`](https://github.com/facebook/zstd)
-- `metastore/` - Mounted during run as metastore location for `sqoop` jobs. Stores value of `IASW_ID` for each table since last run
-- `scripts/` - Runtime scripts and files used to create and run `sqoop` within the container
+- `logs/` - Location of temporary log files. Logs are manually uploaded to AWS CloudWatch after each run is complete 
+- `scripts/` - Runtime scripts and files used to create and run `sqoop` within Docker
 - `secrets/` - Mounted during run to provide DB password via a file. Alter `secrets/IPTS_PASSWORD` to contain your password
-- `target/` - Mounted during run as output directory. All parquet files and job artifacts are saved here
+- `target/` - Mounted during run as output directory. All parquet files and job artifacts are saved temporarily before being uploaded to S3
 
-### Files
+### Important Files
 
-Files needed only for building the Docker container/dependencies.
-
-- `build.sh` - Convenience script to run the Dockercommands that will build the `sqoop` container
-- `build-sqoop.Dockerfile` - Dockerfile to build `sqoop` from scratch if unavailable via the GitLab container registry
-- `build-native-hadoop.Dockerfile` - Dockerfile to build Hadoop from scratch, which is a dependency for `sqoop`. `build-sqoop.Dockerfile` depends on this Dockerfile being run first
-
-Files needed only at runtime after the Docker container is built.
-
-- `run.sh` - Main entrypoint script. Idempotent. Run with `sudo ./run.sh` to:
-  1. Create `sqoop` jobs for all iasWorld tables (if they don't exist)
-  2. Run `sqoop` jobs saved to `metastore/`. This includes all tables by default. Jobs are run incrementally (only rows with an `IASW_ID` greater than the previous run are pulled)
-  3. Sync the output of steps 1 and 2 to S3
-  4. Save a log file of steps 1-3, compress it, then sync it to S3
-- `create-jobs.yaml` - Defines the container needed to create `sqoop` jobs. Outputs job definitions to `metastore/`
-- `run-jobs.yaml` - Defines the containers and environment needed to run `sqoop` jobs in a small, pseudo-distributed Hadoop cluster. Pulls from `metastore/` and outputs to `target/` 
+- `Dockerfile` - Dockerfile to build `sqoop` and all dependencies from scratch if unavailable via the GitLab container registry
+- `run.sh` - Main entrypoint script. Idempotent. Run with `sudo ./run.sh` to extract all iasWorld tables. 
+- `docker-compose.yaml` - Defines the containers and environment needed to run `sqoop` jobs in a small, distributed Hadoop/Hive environment
 - `.env` - Contains DB connection details. Alter before running to provide your own details
-- `crontab.bak` - [Cron](https://www.adminschoice.com/crontab-quick-reference) backup file that specifies schedule on which to execute `run.sh`. Install with `echo crontab.back > sudo crontab`
 
 ## Usage
 
-### Export All Tables
+### Dependencies
 
-By default, running the `run.sh` script will export _all_ tables in iasWorld to `target/`. Subsequent runs will export any rows created or updated since the last run.
+You will need the following tools installed before using this repo:
 
-The `run.sh` script is scheduled to run via cron every night at 1 AM.
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) - Authenticated using `aws configure`
+- [moreutils](http://joeyh.name/code/moreutils/) - For the `ts` timestamp command
+- [jq](https://stedolan.github.io/jq/) - To parse logs to JSON 
 
-### Export A Single Table 
+The rest of the dependencies for `sqoop` are installed using the included `Dockerfile`. To retrieve them, run either of the following commands within the repo directory:
 
-You can query a single table by adding an environmental variable named `IPTS_TABLE` to `create-jobs.yaml` and `run-jobs.yaml`. For example, to query only DWELDAT:
+- `docker-compose pull` - Grabs the latest image from the CCAO GitLab registry, if it exists
+- `docker-compose build` - Builds the `sqoop` image from the included `Dockerfile` 
 
-```yaml
-...
-  environment:
-    - MASTER_HOSTNAME=sqoop-node-master
-    - IPTS_TABLE=DWELDAT
-    ...
-...
-```
+### Export Tables
 
-### Manage Sqoop Jobs
+Nearly all the functionality of this repository is contained in `run.sh`. This script will complete four main tasks:
 
-Sometimes you may need to manually delete or update `sqoop` jobs. To do so, you'll need to create a shell inside the `sqoop` Docker container. You can do this by running the following bash command:
+1. Extract the specified tables from iasWorld and save them to the `target/` directory as Parquet
+2. Remove any existing files on S3 for the extracted tables
+3. Upload the extracted Parquet files to S3
+4. Upload a logstream of the extraction and uploading process to CloudWatch
+
+By default, `sudo ./run.sh` will export _all_ tables in iasWorld to `target/` (and then to S3). To extract a specific table or tables, prefix the run command with the environmental variable `IPTS_TABLE`. For example `sudo IPTS_TABLE="ASMT_HIST CNAME" ./run.sh` will grab the `ASMT_HIST` and `CNAME` tables
+
+## Scheduling
+
+Table extractions are schedule via [`cron`](https://man7.org/linux/man-pages/man8/cron.8.html). To edit the schedule file, use `sudo crontab -e`. The example below schedules daily jobs for frequently updated tables and weekly ones for rarely-updated tables.
 
 ```bash
-docker-compose -f create-jobs.yaml run sqoop-node-master /bin/bash
-```
+# Extract frequently used tables on weekdays at 1 AM CST
+0 6 * * 0-5 cd /local/path/to/repo && /bin/bash IPTS_TABLE="ASMT_ALL HTPAR PARDAT" ./run.sh
 
-To delete an existing `sqoop` job, run the following within the shell:
-
-```bash
-sqoop job --list
-sqoop job --delete ASMT_ALL
-```
-
-## Crontab
-
-```
-0 6 * * * cd /home/shiny-server/services/service_sqoop_iasworld && /bin/bash ./run.sh
+# Extract less-frequently updated tables on weekends
+0 6 * * 6-7 cd /local/path/to/repo && /bin/bash IPTS_TABLE="COMDAT LAND" ./run.sh
 ```
 
 ## Useful Resources
@@ -92,6 +78,12 @@ sqoop job --delete ASMT_ALL
 - [Hadoop Docker image](https://github.com/dvoros/hadoop-docker) - Sqoop image uses this as a dependency
 - [Hadoop cluster Docker image](https://github.com/rancavil/hadoop-single-node-cluster) - Useful setup and options for pseudo-distributed Hadoop
 
+### Hive/HCatalog Resources
+
+- [Docker Hadoop Setup](https://github.com/big-data-europe/docker-hadoop)
+- [HCatalog Setup](https://www.tutorialspoint.com/hcatalog/hcatalog_installation.htm)
+- [Hive Metastore Setup Reference](https://github.com/big-data-europe/docker-hive-metastore-postgresql)
+
 ### Debugging
 
 - [SO post on `--bindir` sqoop option](https://stackoverflow.com/questions/21599785/sqoop-not-able-to-import-table)
@@ -101,9 +93,8 @@ sqoop job --delete ASMT_ALL
 - [Data nodes not connected/listed by Hadoop](https://stackoverflow.com/questions/29910805/namenode-datanode-not-list-by-using-jps)
 - [Oracle JDBC connection issues](https://stackoverflow.com/questions/2327220/oracle-jdbc-intermittent-connection-issue)
 
-### Data Type Mappings (used to populate `--map-column-java`
+### Data Type Mappings (used to populate `--map-column-hive`)
 
-NOTE: Most `sqoop` import errors are caused by incorrect output data types. Types specified by `--map-column-java` must be compatible with the data type in SQL, otherwise you may get numeric overflows or string exceptions.
-
+- [HCatalog Data Types](https://cwiki.apache.org/confluence/display/Hive/HCatalog+InputOutput#HCatalogInputOutput-HCatRecord)
 - [Java to Oracle Type Mapping Matrix](https://docs.oracle.com/cd/E19501-01/819-3659/gcmaz/)
 - [PL/SQL (Oracle SQL) to JDBC mapping](https://docs.oracle.com/cd/B19306_01/java.102/b14188/datamap.htm#CHDBJAGH) - Not applicable here but still helpful
