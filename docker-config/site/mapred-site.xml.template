@@ -8,7 +8,15 @@
         <value>HOSTNAME:9001</value>
     </property>
     <property>
-        <name>yarn.nodemanager.vmem-check-enabled</name>
-        <value>false</value>
+        <name>mapreduce.map.memory.mb</name>
+        <value>1536</value>
+    </property>
+    <property>
+        <name>mapreduce.reduce.memory.mb</name>
+        <value>3072</value>
+    </property>
+    <property>
+        <name>mapreduce.job.heap.memory-mb.ratio</name>
+        <value>0.8</value>
     </property>
 </configuration>

@@ -11,7 +11,7 @@ x-default: &node
     - ./target:/tmp/target
   environment:
     - MASTER_HOSTNAME=sqoop-node-master
-    - NODE_HOSTNAMES=sqoop-node-2 sqoop-node-3 sqoop-node-4
+    # - NODE_HOSTNAMES=sqoop-node-2 sqoop-node-3 sqoop-node-4
     - IPTS_HOSTNAME
     - IPTS_PORT
     - IPTS_SERVICE_NAME
@@ -27,30 +27,38 @@ services:
     <<: *node
     container_name: sqoop-node-master
     hostname: sqoop-node-master
+    ports:
+      - 9870:9870
+      - 9864:9864
+      - 8081:8080
+      - 8082:8088
+      - 8042:8042
     command: >
       /bin/bash -c "/scripts/wait-for-it.sh hive-metastore-server:9083 --
                     /scripts/run-sqoop.sh"
 
-  sqoop-node-2:
-    <<: *node
-    container_name: sqoop-node-2
-    command: tail -f /dev/null
-    depends_on: 
-      - sqoop-node-master
+  # Other datanodes disabled by default since they can cause issues with
+  # memory management when running on the same machine
+  # sqoop-node-2:
+  #   <<: *node
+  #   container_name: sqoop-node-2
+  #   command: tail -f /dev/null
+  #   depends_on: 
+  #     - sqoop-node-master
 
-  sqoop-node-3:
-    <<: *node
-    container_name: sqoop-node-3
-    command: tail -f /dev/null
-    depends_on: 
-      - sqoop-node-master
+  # sqoop-node-3:
+  #   <<: *node
+  #   container_name: sqoop-node-3
+  #   command: tail -f /dev/null
+  #   depends_on: 
+  #     - sqoop-node-master
 
-  sqoop-node-4:
-    <<: *node
-    container_name: sqoop-node-4
-    command: tail -f /dev/null
-    depends_on: 
-      - sqoop-node-master
+  # sqoop-node-4:
+  #   <<: *node
+  #   container_name: sqoop-node-4
+  #   command: tail -f /dev/null
+  #   depends_on: 
+  #     - sqoop-node-master
 
   hive-metastore-postgresql:
     container_name: hive-metastore-postgresql

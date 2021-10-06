@@ -84,7 +84,7 @@ for TABLE in ${JOB_TABLES}; do
         # For all tables with TAXYR column, create a job split by TAXYR
         sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
             --split-by TAXYR \
-            --num-mappers 8
+            --num-mappers 16
     else
         # If no TAXYR col, make hcatalog tables without partitions
         hive -e \
@@ -109,15 +109,11 @@ for TABLE in ${JOB_TABLES}; do
     # If buckets are specified, rewrite output from sqoop to bucketed table
     if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
         hive -e \
-            "SET hive.exec.dynamic.partition=true;
-             SET hive.exec.dynamic.partition.mode=nonstrict;
-             INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
              PARTITION(taxyr) SELECT * FROM ${DB_NAME}.${TABLE_LC};"
     elif [[ ${CONTAINS_TAXYR} == FALSE && ${NUM_BUCKETS} -gt 1 ]]; then
         hive -e \
-            "SET hive.exec.dynamic.partition=true;
-             SET hive.exec.dynamic.partition.mode=nonstrict;
-             INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
              SELECT * FROM ${DB_NAME}.${TABLE_LC};"
     fi
 
