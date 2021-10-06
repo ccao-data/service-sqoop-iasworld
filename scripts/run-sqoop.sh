@@ -1,6 +1,4 @@
 #!/bin/bash
-# Increase arg limit. Hadoop throws errors otherwise
-ulimit -S -s unlimited
 
 # Check if table env var exists from docker, if not, use all tables
 if [[ -z ${IPTS_TABLE} ]]; then
@@ -9,18 +7,17 @@ else
     JOB_TABLES=${IPTS_TABLE}
 fi
 
-# Weird workaround required for dir not found error
-hdfs dfs -mkdir -p /user/root/
-
 # Create database in HDFS to store tables
-export DB_NAME=iasworld
-hcat -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};"
+DB_NAME=iasworld
+hive -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};"
 
 echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
 for TABLE in ${JOB_TABLES}; do
 
     # Get lowercase table name
     TABLE_LC=$(echo ${TABLE} | awk '{print tolower($0)}')
+    unset HADOOP_CLASSPATH SQOOP_CLASSPATH
+    mkdir -p /tmp/bindir/${TABLE}
 
     # Get column names to create hive table
     COLUMN_MAPPINGS=$(awk -F"," \
@@ -49,8 +46,7 @@ for TABLE in ${JOB_TABLES}; do
 
     # Options passed to sqoop
     SQOOP_OPTIONS_MAIN=(
-        job -libjars /tmp/bindir/ \
-        -D oracle.sessionTimeZone=America/Chicago \
+        job -D oracle.sessionTimeZone=America/Chicago \
         --create ${TABLE} -- import \
         --bindir /tmp/bindir/ \
         --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
@@ -65,8 +61,9 @@ for TABLE in ${JOB_TABLES}; do
     # get partitioning and splitby during sqoop import
     if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
 
-        # Create an hcatalog table to fill using sqoop, plus an additional
-        # bucketed table fill later via hive INSERT if num_buckets > 1
+        # Create an hcatalog table to fill using sqoop. This table is
+        # unpartitioned since it's faster to extract
+        # Also make additional tables filled later via hive INSERT.
         hive -e \
             "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS}, taxyr string)
              STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
@@ -76,6 +73,11 @@ for TABLE in ${JOB_TABLES}; do
                 "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
                  PARTITIONED BY (taxyr string)
                  CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
+                 STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
+        else
+            hive -e \
+                "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
+                 PARTITIONED BY (taxyr string)
                  STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
         fi
 
@@ -97,23 +99,21 @@ for TABLE in ${JOB_TABLES}; do
         fi
 
         # For tables with no TAXYR column, just make a job with no split
-        sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
-            -m 1
+        sqoop "${SQOOP_OPTIONS_MAIN[@]}" -m 1
     fi
     echo "Running job for table: ${TABLE}"
 
     # Execute saved sqoop job
-    sqoop job -libjars /tmp/bindir/ \
-        --exec ${TABLE}
+    sqoop job --exec ${TABLE}
 
     # If buckets are specified, rewrite output from sqoop to bucketed table
-    if [[ ${CONTAINS_TAXYR} == TRUE ]] && [[ ${NUM_BUCKETS} -gt 1 ]]; then
+    if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
         hive -e \
             "SET hive.exec.dynamic.partition=true;
              SET hive.exec.dynamic.partition.mode=nonstrict;
              INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
-             SELECT * FROM ${DB_NAME}.${TABLE_LC};"
-    elif [[ ${CONTAINS_TAXYR} == FALSE ]] && [[ ${NUM_BUCKETS} -gt 1 ]]; then
+             PARTITION(taxyr) SELECT * FROM ${DB_NAME}.${TABLE_LC};"
+    elif [[ ${CONTAINS_TAXYR} == FALSE && ${NUM_BUCKETS} -gt 1 ]]; then
         hive -e \
             "SET hive.exec.dynamic.partition=true;
              SET hive.exec.dynamic.partition.mode=nonstrict;
@@ -123,7 +123,7 @@ for TABLE in ${JOB_TABLES}; do
 
     # Copy from distributed file system (HDFS) to local mounted dir
     mkdir -p /tmp/target/${TABLE}
-    if [[ ${NUM_BUCKETS} -gt 1 ]]; then
+    if [[ ${NUM_BUCKETS} -gt 1 || ${CONTAINS_TAXYR} == TRUE ]]; then
         hdfs dfs -copyToLocal \
             /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}_bucketed/* \
             /tmp/target/${TABLE}

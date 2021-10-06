@@ -3,7 +3,6 @@
 $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
 # Remove annoying warnings about dependencies
-#HADOOP_CLASSPATH=$(hcat -classpath) export HADOOP_CLASSPATH
 export ACCUMULO_HOME=/tmp
 export ZOOKEEPER_HOME=/tmp
 export HBASE_HOME=/tmp
@@ -32,6 +31,7 @@ if [[ -z "$SKIP_BOOTSTRAP" ]]; then
     $HADOOP_HOME/sbin/start-dfs.sh
     $HADOOP_HOME/sbin/start-yarn.sh
     $HADOOP_HOME/bin/mapred --daemon start historyserver
+    hdfs dfs -mkdir -p /user/root/
 
     # Grab JDBC drivers from mounted volume
     cp /jdbc/* $SQOOP_HOME/lib

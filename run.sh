@@ -19,7 +19,7 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
 
 # Drop existing keys on S3 for any pulled tables
 TABLES_EXTRACTED=$(ls target/)
-for TABLE in ${TABLE_EXTRACTED}; do
+for TABLE in ${TABLES_EXTRACTED}; do
     /usr/bin/aws s3 rm \
         ${BUCKET_URI}/iasworld/${TABLE} \
         --exclude "*" \
