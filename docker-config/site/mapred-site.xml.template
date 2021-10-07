@@ -9,11 +9,11 @@
     </property>
     <property>
         <name>mapreduce.map.memory.mb</name>
-        <value>1536</value>
+        <value>2048</value>
     </property>
     <property>
         <name>mapreduce.reduce.memory.mb</name>
-        <value>3072</value>
+        <value>4096</value>
     </property>
     <property>
         <name>mapreduce.job.heap.memory-mb.ratio</name>
