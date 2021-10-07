@@ -11,7 +11,6 @@ x-default: &node
     - ./target:/tmp/target
   environment:
     - MASTER_HOSTNAME=sqoop-node-master
-    # - NODE_HOSTNAMES=sqoop-node-2 sqoop-node-3 sqoop-node-4
     - IPTS_HOSTNAME
     - IPTS_PORT
     - IPTS_SERVICE_NAME
@@ -36,29 +35,6 @@ services:
     command: >
       /bin/bash -c "/scripts/wait-for-it.sh hive-metastore-server:9083 --
                     /scripts/run-sqoop.sh"
-
-  # Other datanodes disabled by default since they can cause issues with
-  # memory management when running on the same machine
-  # sqoop-node-2:
-  #   <<: *node
-  #   container_name: sqoop-node-2
-  #   command: tail -f /dev/null
-  #   depends_on: 
-  #     - sqoop-node-master
-
-  # sqoop-node-3:
-  #   <<: *node
-  #   container_name: sqoop-node-3
-  #   command: tail -f /dev/null
-  #   depends_on: 
-  #     - sqoop-node-master
-
-  # sqoop-node-4:
-  #   <<: *node
-  #   container_name: sqoop-node-4
-  #   command: tail -f /dev/null
-  #   depends_on: 
-  #     - sqoop-node-master
 
   hive-metastore-postgresql:
     container_name: hive-metastore-postgresql
