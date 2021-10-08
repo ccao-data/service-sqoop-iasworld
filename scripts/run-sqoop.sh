@@ -2,7 +2,7 @@
 
 # Check if table env var exists from docker, if not, use all tables
 if [[ -z ${IPTS_TABLE} ]]; then
-    JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /scripts/tables-list.csv)
+    JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /tables/tables-list.csv)
 else
     JOB_TABLES=${IPTS_TABLE}
 fi
@@ -19,20 +19,11 @@ for TABLE in ${JOB_TABLES}; do
     unset HADOOP_CLASSPATH SQOOP_CLASSPATH
     mkdir -p /tmp/bindir/${TABLE}
 
-    # Get column names to create hive table
-    COLUMN_MAPPINGS=$(awk -F"," \
-        -v OFS=',' \
-        -v table=${TABLE} \
-        '$1 == table {if( !($2=="TAXYR") ) print tolower($2)" "$6}' \
-        /scripts/tables-mapping.csv \
-        | paste -sd,
-    )
-
     # Boolean value for whether $TABLE contains the TAXYR column
     CONTAINS_TAXYR=$(awk -F"," \
         -v table=${TABLE} \
         '$1 == table {print $2}' \
-        /scripts/tables-list.csv |
+        /tables/tables-list.csv |
         tr -d "\n" | tr -d "\r"
     )
 
@@ -40,7 +31,7 @@ for TABLE in ${JOB_TABLES}; do
     NUM_BUCKETS=$(awk -F"," \
         -v table=${TABLE} \
         '$1 == table {print $3}' \
-        /scripts/tables-list.csv |
+        /tables/tables-list.csv |
         tr -d "\n" | tr -d "\r"
     )
 
