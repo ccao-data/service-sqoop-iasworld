@@ -115,7 +115,7 @@ RUN curl -o /usr/share/java/postgresql-jdbc.jar https://jdbc.postgresql.org/down
     ln -s /usr/share/java/postgresql-jdbc.jar ${HIVE_HOME}/lib/postgresql-jdbc.jar
 
 # Entrypoint/startup for sqoop and hive
-COPY docker-config/java-json.jar ${SQOOP_HOME}/lib 
+ADD https://repo1.maven.org/maven2/org/json/json/20090211/json-20090211.jar ${SQOOP_HOME}/lib
 COPY docker-config/bootstrap.sh docker-config/entrypoint.sh /etc/docker-config/
 RUN chown -R root:root /etc/docker-config/ && \
     chmod -R 755 /etc/docker-config/ && \
