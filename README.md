@@ -11,8 +11,9 @@ In this case, `sqoop` is used to export full-table dumps from iasWorld, the CCAO
 - `docker-config/` - Configuration and setup files for the Hadoop/Hive backend. Used during Docker build only
 - `drivers/` - Mounted during run to provide connection drivers to `sqoop`. Put OJDBC files here (`ojdbc8.jar` or `ojdbc7.jar`)
 - `logs/` - Location of temporary log files. Logs are manually uploaded to AWS CloudWatch after each run is complete 
-- `scripts/` - Runtime scripts and files used to create and run `sqoop` within Docker
+- `scripts/` - Runtime scripts to run `sqoop` jobs within Docker
 - `secrets/` - Mounted during run to provide DB password via a file. Alter `secrets/IPTS_PASSWORD` to contain your password
+- `tables/` - Table definitions and metadata used to create Hive tables for `sqoop` to extract to. Manually stored since certain tables include paritioning and bucketing 
 - `target/` - Mounted during run as output directory. All parquet files and job artifacts are saved temporarily before being uploaded to S3
 
 ### Important Files

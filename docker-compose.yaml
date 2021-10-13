@@ -7,7 +7,8 @@ x-default: &node
   image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
   volumes:
     - ./drivers:/jdbc
-    - ./scripts:/scripts
+    - ./scripts:/tmp/scripts
+    - ./tables:/tmp/tables
     - ./target:/tmp/target
   environment:
     - MASTER_HOSTNAME=sqoop-node-master
@@ -33,8 +34,8 @@ services:
       - 8082:8088
       - 8042:8042
     command: >
-      /bin/bash -c "/scripts/wait-for-it.sh hive-metastore-server:9083 --
-                    /scripts/run-sqoop.sh"
+      /bin/bash -c "/tmp/scripts/wait-for-it.sh hive-metastore-server:9083 --
+                    /tmp/scripts/run-sqoop.sh"
 
   hive-metastore-postgresql:
     container_name: hive-metastore-postgresql
@@ -57,7 +58,7 @@ services:
       - MASTER_HOSTNAME=sqoop-node-master
       - SKIP_BOOTSTRAP=1
     command: >
-      /bin/bash -c "/scripts/wait-for-it.sh hive-metastore-postgresql:5432 --
+      /bin/bash -c "/tmp/scripts/wait-for-it.sh hive-metastore-postgresql:5432 --
                     schematool -initSchema -dbType postgres
                     hive --service metastore"
 
