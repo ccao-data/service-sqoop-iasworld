@@ -28,7 +28,7 @@ for TABLE in ${TABLES}; do
     # will be readded manually)
     cat ${TABLE}.sql \
         | sed '/ROW FORMAT SERDE/Q' \
-        | sed '/taxyr/d' \
+        | sed '/`taxyr` decimal(4,0)/d' \
         > ${TABLE}.sql.tmp1
 
     # For TAXYR and BUCKETS, create an unpartitioned, unbucketed table
