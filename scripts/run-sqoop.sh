@@ -2,7 +2,7 @@
 
 # Check if table env var exists from docker, if not, use all tables
 if [[ -z ${IPTS_TABLE} ]]; then
-    JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /tables/tables-list.csv)
+    JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /tmp/tables/tables-list.csv)
 else
     JOB_TABLES=${IPTS_TABLE}
 fi
@@ -16,14 +16,13 @@ for TABLE in ${JOB_TABLES}; do
 
     # Get lowercase table name
     TABLE_LC=$(echo ${TABLE} | awk '{print tolower($0)}')
-    unset HADOOP_CLASSPATH SQOOP_CLASSPATH
     mkdir -p /tmp/bindir/${TABLE}
 
     # Boolean value for whether $TABLE contains the TAXYR column
     CONTAINS_TAXYR=$(awk -F"," \
         -v table=${TABLE} \
         '$1 == table {print $2}' \
-        /tables/tables-list.csv |
+        /tmp/tables/tables-list.csv |
         tr -d "\n" | tr -d "\r"
     )
 
@@ -31,7 +30,7 @@ for TABLE in ${JOB_TABLES}; do
     NUM_BUCKETS=$(awk -F"," \
         -v table=${TABLE} \
         '$1 == table {print $3}' \
-        /tables/tables-list.csv |
+        /tmp/tables/tables-list.csv |
         tr -d "\n" | tr -d "\r"
     )
 
@@ -39,7 +38,7 @@ for TABLE in ${JOB_TABLES}; do
     SQOOP_OPTIONS_MAIN=(
         job -D oracle.sessionTimeZone=America/Chicago \
         --create ${TABLE} -- import \
-        --bindir /tmp/bindir/ \
+        --bindir /tmp/bindir/${TABLE} \
         --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
         --username ${IPTS_USERNAME} \
         --password-file file:///run/secrets/IPTS_PASSWORD \
@@ -48,69 +47,29 @@ for TABLE in ${JOB_TABLES}; do
         --hcatalog-table ${TABLE}
     )
 
+    # Create the Hive tables necessary to run sqoop jobs
+    # Table definitions are stores in the repo
+    hive -f /tmp/tables/${TABLE}.sql
+
     # Create a sqoop job for the selected table(s). Tables with TAXYR
     # get partitioning and splitby during sqoop import
     if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
-
-        # Create an hcatalog table to fill using sqoop. This table is
-        # unpartitioned since it's faster to extract
-        # Also make additional tables filled later via hive INSERT.
-        hive -e \
-            "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS}, taxyr string)
-             STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
-
-        if [[ ${NUM_BUCKETS} -gt 1 ]]; then
-            hive -e \
-                "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
-                 PARTITIONED BY (taxyr string)
-                 CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
-                 STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
-        else
-            hive -e \
-                "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
-                 PARTITIONED BY (taxyr string)
-                 STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
-        fi
-
-        # For all tables with TAXYR column, create a job split by TAXYR
-        sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
-            --split-by TAXYR \
-            --num-mappers 16
+        sqoop "${SQOOP_OPTIONS_MAIN[@]}" --split-by TAXYR --num-mappers 16
     else
-        # If no TAXYR col, make hcatalog tables without partitions
-        hive -e \
-            "CREATE TABLE ${DB_NAME}.${TABLE}(${COLUMN_MAPPINGS})
-             STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
-
-        if [[ ${NUM_BUCKETS} -gt 1 ]]; then
-            hive -e \
-                "CREATE TABLE ${DB_NAME}.${TABLE}_bucketed(${COLUMN_MAPPINGS})
-                 CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
-                 STORED AS PARQUET TBLPROPERTIES ('parquet.compression'='SNAPPY');"
-        fi
-
-        # For tables with no TAXYR column, just make a job with no split
         sqoop "${SQOOP_OPTIONS_MAIN[@]}" -m 1
     fi
-    echo "Running job for table: ${TABLE}"
 
     # Execute saved sqoop job
+    echo "Running job for table: ${TABLE}"
     sqoop job --exec ${TABLE}
 
     # If buckets are specified, rewrite output from sqoop to bucketed table
-    if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
-        hive -e \
-            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
-             PARTITION(taxyr) SELECT * FROM ${DB_NAME}.${TABLE_LC};"
-    elif [[ ${CONTAINS_TAXYR} == FALSE && ${NUM_BUCKETS} -gt 1 ]]; then
+    # Then copy from distributed file system (HDFS) to local mounted dir
+    # mkdir -p /tmp/target/${TABLE}
+    if [[ ${NUM_BUCKETS} -gt 1 ]]; then
         hive -e \
             "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
              SELECT * FROM ${DB_NAME}.${TABLE_LC};"
-    fi
-
-    # Copy from distributed file system (HDFS) to local mounted dir
-    mkdir -p /tmp/target/${TABLE}
-    if [[ ${NUM_BUCKETS} -gt 1 || ${CONTAINS_TAXYR} == TRUE ]]; then
         hdfs dfs -copyToLocal \
             /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}_bucketed/* \
             /tmp/target/${TABLE}
@@ -128,5 +87,7 @@ for TABLE in ${JOB_TABLES}; do
     find /tmp/target/${TABLE} -type f -name '_SUCCESS' -delete
     find /tmp/target/${TABLE} -type f -exec mv {} {}.snappy.parquet \;
 
+    # Clear the sqoop workers cache of copied JARs
+    rm -rf /tmp/hadoop-root/nm-local-dir/usercache/*
     echo "Completed job for table: ${TABLE}"
 done
