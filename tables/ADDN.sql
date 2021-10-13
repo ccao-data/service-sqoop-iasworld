@@ -2,7 +2,6 @@ CREATE TABLE `iasworld.addn`(
   `jur` varchar(6), 
   `parid` varchar(30), 
   `card` decimal(4,0), 
-  `taxyr` string, 
   `lline` decimal(4,0), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
@@ -77,7 +76,8 @@ CREATE TABLE `iasworld.addn`(
   `userval3` decimal(10,0), 
   `userval4` decimal(10,0), 
   `userval5` decimal(10,0), 
-  `area_sqm` decimal(11,3))
+  `area_sqm` decimal(11,3),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.addn_bucketed`(

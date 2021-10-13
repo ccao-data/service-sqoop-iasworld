@@ -2,7 +2,6 @@ CREATE TABLE `iasworld.asmt_all`(
   `jur` varchar(6), 
   `rolltype` varchar(10), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `valyear` decimal(4,0), 
   `valclass` varchar(4), 
   `ovrclass` varchar(4), 
@@ -319,7 +318,8 @@ CREATE TABLE `iasworld.asmt_all`(
   `ovrcod60` varchar(3), 
   `ovrval60` decimal(10,0), 
   `val60` decimal(10,0), 
-  `splitno` decimal(15,0))
+  `splitno` decimal(15,0),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.asmt_all_bucketed`(

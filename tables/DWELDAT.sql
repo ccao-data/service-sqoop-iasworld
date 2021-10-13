@@ -2,7 +2,6 @@ CREATE TABLE `iasworld.dweldat`(
   `jur` varchar(6), 
   `parid` varchar(30), 
   `card` decimal(4,0), 
-  `taxyr` string, 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
   `who` varchar(10), 
@@ -304,7 +303,8 @@ CREATE TABLE `iasworld.dweldat`(
   `suppress` varchar(1), 
   `lumpcamod` decimal(10,5), 
   `bld_modelid` varchar(80), 
-  `ovrmraval` decimal(10,0))
+  `ovrmraval` decimal(10,0),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.dweldat_bucketed`(

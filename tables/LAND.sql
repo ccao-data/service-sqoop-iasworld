@@ -1,7 +1,6 @@
 CREATE TABLE `iasworld.land`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `lline` decimal(4,0), 
   `ltype` varchar(1), 
   `code` varchar(6), 
@@ -148,7 +147,8 @@ CREATE TABLE `iasworld.land`(
   `user32` varchar(80), 
   `user33` varchar(80), 
   `user34` varchar(80), 
-  `user35` varchar(80))
+  `user35` varchar(80),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.land_bucketed`(

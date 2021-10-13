@@ -1,7 +1,6 @@
 CREATE TABLE `iasworld.exdet`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `excode` varchar(6), 
   `lineno` decimal(3,0), 
   `seq` decimal(3,0), 
@@ -199,7 +198,8 @@ CREATE TABLE `iasworld.exdet`(
   `assetid` decimal(8,2), 
   `yrbase` decimal(4,0), 
   `begdt` string, 
-  `enddt` string)
+  `enddt` string,
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.exdet_bucketed`(

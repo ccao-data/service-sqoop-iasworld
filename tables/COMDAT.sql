@@ -2,7 +2,6 @@ CREATE TABLE `iasworld.comdat`(
   `jur` varchar(6), 
   `parid` varchar(30), 
   `card` decimal(4,0), 
-  `taxyr` string, 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
   `who` varchar(10), 
@@ -141,7 +140,8 @@ CREATE TABLE `iasworld.comdat`(
   `userval4` decimal(10,0), 
   `userval5` decimal(10,0), 
   `bld_modelid` varchar(80), 
-  `ovrmraval` decimal(10,0))
+  `ovrmraval` decimal(10,0),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.comdat_bucketed`(

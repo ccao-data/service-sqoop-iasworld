@@ -2,7 +2,6 @@ CREATE TABLE `iasworld.oby`(
   `jur` varchar(6), 
   `parid` varchar(30), 
   `card` decimal(4,0), 
-  `taxyr` string, 
   `lline` decimal(4,0), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
@@ -123,7 +122,8 @@ CREATE TABLE `iasworld.oby`(
   `wallhgt_m` decimal(5,3), 
   `cubicmeters` decimal(12,3), 
   `area_sqm` decimal(11,3), 
-  `bld_modelid` varchar(80))
+  `bld_modelid` varchar(80),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.oby_bucketed`(

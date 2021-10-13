@@ -1,7 +1,6 @@
 CREATE TABLE `iasworld.owndat`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `ownseq` decimal(3,0), 
   `po` decimal(1,0), 
   `seq` decimal(3,0), 
@@ -141,7 +140,8 @@ CREATE TABLE `iasworld.owndat`(
   `udate8` string, 
   `udate9` string, 
   `udate10` string, 
-  `skip_addr_validation` varchar(1))
+  `skip_addr_validation` varchar(1),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.owndat_bucketed`(

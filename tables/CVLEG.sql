@@ -2,7 +2,6 @@ CREATE TABLE `iasworld.cvleg`(
   `conveyno` decimal(9,0), 
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `parseq` decimal(3,0), 
   `who` varchar(10), 
   `wen` string, 
@@ -14,9 +13,7 @@ CREATE TABLE `iasworld.cvleg`(
   `pown1` varchar(205), 
   `multown` varchar(1), 
   `pmultown` varchar(1), 
-  `ltaxyr` decimal(4,0), 
   `lseq` decimal(3,0), 
-  `otaxyr` decimal(4,0), 
   `oseq` decimal(3,0), 
   `upd_owndat` varchar(1), 
   `upd_ownmlt` varchar(1), 
@@ -192,7 +189,8 @@ CREATE TABLE `iasworld.cvleg`(
   `user57` varchar(80), 
   `user58` varchar(80), 
   `user59` varchar(80), 
-  `user60` varchar(80))
+  `user60` varchar(80),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.cvleg_bucketed`(

@@ -1,14 +1,12 @@
 CREATE TABLE `iasworld.cvown`(
   `jur` varchar(6), 
   `conveyno` decimal(9,0), 
-  `taxyr` string, 
   `ownseq` decimal(3,0), 
   `who` varchar(10), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
   `status` varchar(1), 
-  `otaxyr` decimal(4,0), 
   `oseq` decimal(3,0), 
   `delflg` varchar(1), 
   `chgrsn` varchar(2), 
@@ -155,7 +153,8 @@ CREATE TABLE `iasworld.cvown`(
   `udate8` string, 
   `udate9` string, 
   `udate10` string, 
-  `skip_addr_validation` varchar(1))
+  `skip_addr_validation` varchar(1),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.cvown_bucketed`(

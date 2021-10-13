@@ -1,7 +1,6 @@
 CREATE TABLE `iasworld.legdat`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
   `who` varchar(10), 
@@ -146,7 +145,8 @@ CREATE TABLE `iasworld.legdat`(
   `user57` varchar(80), 
   `user58` varchar(80), 
   `user59` varchar(80), 
-  `user60` varchar(80))
+  `user60` varchar(80),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.legdat_bucketed`(

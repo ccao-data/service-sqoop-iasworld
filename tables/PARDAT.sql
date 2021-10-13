@@ -1,7 +1,6 @@
 CREATE TABLE `iasworld.pardat`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
   `who` varchar(10), 
@@ -219,7 +218,8 @@ CREATE TABLE `iasworld.pardat`(
   `userval8` decimal(10,0), 
   `userval9` decimal(10,0), 
   `userval10` decimal(10,0), 
-  `skip_addr_validation` varchar(1))
+  `skip_addr_validation` varchar(1),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.pardat_bucketed`(

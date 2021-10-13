@@ -1,7 +1,6 @@
 CREATE TABLE `iasworld.htpar`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` string, 
   `heartyp` varchar(1), 
   `subkey` decimal(3,0), 
   `seq` decimal(3,0), 
@@ -315,7 +314,8 @@ CREATE TABLE `iasworld.htpar`(
   `userval2` decimal(10,0), 
   `userval3` decimal(10,0), 
   `userval4` decimal(10,0), 
-  `userval5` decimal(10,0))
+  `userval5` decimal(10,0),
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.htpar_bucketed`(

@@ -1,7 +1,6 @@
 CREATE TABLE `iasworld.cvtran`(
   `jur` varchar(6), 
   `conveyno` decimal(9,0), 
-  `taxyr` string, 
   `who` varchar(10), 
   `wen` string, 
   `whocalc` varchar(10), 
@@ -175,7 +174,8 @@ CREATE TABLE `iasworld.cvtran`(
   `own2_prefix` varchar(20), 
   `own2_suffix` varchar(20), 
   `own2_companyname` varchar(205), 
-  `notes` string)
+  `notes` string,
+  `taxyr` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.cvtran_bucketed`(
