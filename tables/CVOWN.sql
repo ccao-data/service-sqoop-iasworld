@@ -316,6 +316,6 @@ CREATE TABLE `iasworld.cvown_bucketed`(
   `udate10` string, 
   `skip_addr_validation` varchar(1))
 PARTITIONED BY (`taxyr` string)
-CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
+CLUSTERED BY (`parid`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

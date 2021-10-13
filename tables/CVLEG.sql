@@ -390,6 +390,6 @@ CREATE TABLE `iasworld.cvleg_bucketed`(
   `user59` varchar(80), 
   `user60` varchar(80))
 PARTITIONED BY (`taxyr` string)
-CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
+CLUSTERED BY (`parid`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

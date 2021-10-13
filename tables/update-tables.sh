@@ -90,6 +90,12 @@ TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
 
     fi
 
+    # Delete bucketing sort of CV table (no seq number)
+    if [[ ${TABLE} == *"CV"* ]]; then
+        echo "TEST"
+        sed -i 's/SORTED BY (`seq`) //' ${TABLE}.sql
+    fi
+
     rm -f ./*.tmp*
 
 done
