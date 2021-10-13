@@ -42,7 +42,7 @@ for TABLE in ${JOB_TABLES}; do
         --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
         --username ${IPTS_USERNAME} \
         --password-file file:///run/secrets/IPTS_PASSWORD \
-        --table IASWORLD.${TABLE} \
+        --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
         --hcatalog-database ${DB_NAME} \
         --hcatalog-table ${TABLE}
     )
@@ -65,11 +65,17 @@ for TABLE in ${JOB_TABLES}; do
 
     # If buckets are specified, rewrite output from sqoop to bucketed table
     # Then copy from distributed file system (HDFS) to local mounted dir
-    # mkdir -p /tmp/target/${TABLE}
+    mkdir -p /tmp/target/${TABLE}
     if [[ ${NUM_BUCKETS} -gt 1 ]]; then
-        hive -e \
-            "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
-             SELECT * FROM ${DB_NAME}.${TABLE_LC};"
+        if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
+            hive -e \
+                "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+                 PARTITION(taxyr) SELECT * FROM ${DB_NAME}.${TABLE_LC};"
+        else
+            hive -e \
+                "INSERT OVERWRITE TABLE ${DB_NAME}.${TABLE_LC}_bucketed
+                 SELECT * FROM ${DB_NAME}.${TABLE_LC};"
+        fi
         hdfs dfs -copyToLocal \
             /user/hive/warehouse/${DB_NAME}.db/${TABLE_LC}_bucketed/* \
             /tmp/target/${TABLE}
