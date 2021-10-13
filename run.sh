@@ -17,16 +17,30 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
 # Cleanup after docker run
 /usr/local/bin/docker-compose rm -f -s -v
 
-# Drop existing keys on S3 for any pulled tables
+# Drop existing keys on S3 for any pulled tables. Will only drop folders for
+# which there are local taxyr replacements
 TABLES_EXTRACTED=$(ls target/)
 for TABLE in ${TABLES_EXTRACTED}; do
-    /usr/bin/aws s3 rm \
-        ${BUCKET_URI}/iasworld/${TABLE} \
-        --exclude "*" \
-        --include "*.parquet" \
-        --recursive \
-        | ts '%.s' \
-        | tee -a ${TEMP_LOG_FILE}
+    SUB_DIRS=$(find target/${TABLE}/* -maxdepth 1 -type d -exec basename {} \;)
+    if [[ ! -z $SUB_DIRS && $(echo ${SUB_DIRS} | wc -l ) -gt 0 ]]; then
+        for dir in ${SUB_DIRS}; do
+            /usr/bin/aws s3 rm \
+                ${BUCKET_URI}/iasworld/${TABLE}/${dir} \
+                --exclude "*" \
+                --include "*.parquet" \
+                --recursive \
+                | ts '%.s' \
+                | tee -a ${TEMP_LOG_FILE}
+        done
+    else
+        /usr/bin/aws s3 rm \
+            ${BUCKET_URI}/iasworld/${TABLE} \
+            --exclude "*" \
+            --include "*.parquet" \
+            --recursive \
+            | ts '%.s' \
+            | tee -a ${TEMP_LOG_FILE}
+    fi
 done
 
 # Uploaded pulled files from local target/ dir to S3

@@ -4,14 +4,14 @@
 if [[ -z ${IPTS_TABLE} ]]; then
     JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /tmp/tables/tables-list.csv)
 else
-    JOB_TABLES=${IPTS_TABLE}
+    JOB_TABLES=$(echo ${IPTS_TABLE} | tr -cd '[:alpha:][:space:]_')
 fi
 
 # Create database in HDFS to store tables
 DB_NAME=iasworld
 hive -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};"
 
-echo "Creating jobs for table(s): $(echo ${JOB_TABLES} | paste -sd,)"
+echo "Creating jobs for table(s): ${JOB_TABLES}"
 for TABLE in ${JOB_TABLES}; do
 
     # Get lowercase table name
@@ -34,6 +34,18 @@ for TABLE in ${JOB_TABLES}; do
         tr -d "\n" | tr -d "\r"
     )
 
+    # Construct a query based on specified year and condition
+    QUERY_YEAR=$(echo ${IPTS_TABLE} | grep -Po "(?<=${TABLE}.)[0-9]{4}")
+    QUERY_COND=$(echo ${IPTS_TABLE} | grep -Po "(?<=${TABLE})[<>=]")
+    if [[ -z ${QUERY_YEAR} && -z ${QUERY_COND} ]]; then
+        QUERY="SELECT * FROM IASWORLD.${TABLE}
+               WHERE \$CONDITIONS"
+    else
+        QUERY="SELECT * FROM IASWORLD.${TABLE}
+               WHERE TAXYR ${QUERY_COND} ${QUERY_YEAR}
+               AND \$CONDITIONS"
+    fi
+
     # Options passed to sqoop
     SQOOP_OPTIONS_MAIN=(
         job -D oracle.sessionTimeZone=America/Chicago \
@@ -42,7 +54,7 @@ for TABLE in ${JOB_TABLES}; do
         --connect jdbc:oracle:thin:@//${IPTS_HOSTNAME}:${IPTS_PORT}/${IPTS_SERVICE_NAME} \
         --username ${IPTS_USERNAME} \
         --password-file file:///run/secrets/IPTS_PASSWORD \
-        --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS" \
+        --query "${QUERY}" \
         --hcatalog-database ${DB_NAME} \
         --hcatalog-table ${TABLE}
     )
@@ -60,7 +72,7 @@ for TABLE in ${JOB_TABLES}; do
     fi
 
     # Execute saved sqoop job
-    echo "Running job for table: ${TABLE}"
+    echo "Running job for table: ${TABLE} with query: ${QUERY}"
     sqoop job --exec ${TABLE}
 
     # If buckets are specified, rewrite output from sqoop to bucketed table

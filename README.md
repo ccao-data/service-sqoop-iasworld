@@ -2,7 +2,7 @@
 
 This repository contains the dependencies and scripts necessary to run [`sqoop`](https://sqoop.apache.org/docs/1.4.7/SqoopUserGuide.html), a data extraction tool for transferring data from relational databases to Hadoop, Hive, or Parquet.
 
-In this case, `sqoop` is used to export full-table dumps from iasWorld, the CCAO's system of record, to an [HCatalog](https://cwiki.apache.org/confluence/display/Hive/HCatalog). The result is a set of partitioned and bucketed Parquet files which can be uploaded to [AWS S3](https://aws.amazon.com/s3/) and queried directly via [AWS Athena](https://aws.amazon.com/athena).
+In this case, `sqoop` is used to export table dumps from iasWorld, the CCAO's system of record, to an [HCatalog](https://cwiki.apache.org/confluence/display/Hive/HCatalog). The result is a set of partitioned and bucketed Parquet files which can be uploaded to [AWS S3](https://aws.amazon.com/s3/) and queried directly via [AWS Athena](https://aws.amazon.com/athena).
 
 ## Structure 
 
@@ -50,6 +50,8 @@ Nearly all the functionality of this repository is contained in `run.sh`. This s
 4. Upload a logstream of the extraction and uploading process to CloudWatch
 
 By default, `sudo ./run.sh` will export _all_ tables in iasWorld to `target/` (and then to S3). To extract a specific table or tables, prefix the run command with the environmental variable `IPTS_TABLE`. For example `sudo IPTS_TABLE="ASMT_HIST CNAME" ./run.sh` will grab the `ASMT_HIST` and `CNAME` tables
+
+You can also specify a `TAXYR` within `IPTS_TABLE` using conditional symbols. For example, `sudo IPTS_TABLE="ASMT_HIST>2019 ADDRINDX=2020" ./run.sh` will get _only_ records with a `TAXYR` greater than 2019 for `ASMT_HIST` and only records with a `TAXYR` equal to 2020 for `ADDRINDX`. Only `=`, `<`, and `>` are allowed as conditional operators.
 
 ## Scheduling
 
