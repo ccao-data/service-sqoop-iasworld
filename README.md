@@ -58,11 +58,11 @@ You can also specify a `TAXYR` within `IPTS_TABLE` using conditional symbols. Fo
 Table extractions are schedule via [`cron`](https://man7.org/linux/man-pages/man8/cron.8.html). To edit the schedule file, use `sudo crontab -e`. The example below schedules daily jobs for frequently updated tables and weekly ones for rarely-updated tables.
 
 ```bash
-# Extract frequently used tables on weekdays at 1 AM CST
-0 6 * * 0-5 cd /local/path/to/repo && /bin/bash IPTS_TABLE="ASMT_ALL HTPAR PARDAT" ./run.sh
+# Extract recent years from frequently used tables on weekdays at 1 AM CST
+0 6 * * 1,2,4,5 cd /local/path/to/repo && /bin/bash YEAR=$(($(date +%Y) - 2)) IPTS_TABLE="ADDN>$YEAR APRVAL>$YEAR ASMT_HIST>$YEAR ASMT_ALL>$YEAR COMDAT>$YEAR DWELDAT>$YEAR EXDET>$YEAR HTPAR>$YEAR LEGDAT>$YEAR OBY>$YEAR OWNDAT>$YEAR PARDAT>$YEAR SALES SPLCOM>$YEAR" ./run.sh
 
-# Extract less-frequently updated tables on weekends
-0 6 * * 6-7 cd /local/path/to/repo && /bin/bash IPTS_TABLE="COMDAT LAND" ./run.sh
+# Extract all tables on Wednesday and Saturday at 1 AM CST
+0 6 * * 3,6 cd /local/path/to/repo && /bin/bash ./run.sh
 ```
 
 ## Useful Resources
