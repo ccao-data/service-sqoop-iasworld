@@ -66,5 +66,5 @@ CREATE TABLE `iasworld.lpnbhd`(
   `revmeth` varchar(1), 
   `landpct` decimal(10,0), 
   `modelid` decimal(10,0))
-STORED AS PARQUET;
-        
+STORED AS PARQUET
+TBLPROPERTIES ('parquet.compression'='SNAPPY');

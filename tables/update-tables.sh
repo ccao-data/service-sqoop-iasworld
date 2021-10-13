@@ -84,8 +84,8 @@ TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
         cat ${TABLE}.sql.tmp1 ${TABLE}.sql.tmp2 > ${TABLE}.sql
     else
 
-        echo "STORED AS PARQUET;
-        " >> ${TABLE}.sql.tmp1
+        echo "STORED AS PARQUET
+TBLPROPERTIES ('parquet.compression'='SNAPPY');" >> ${TABLE}.sql.tmp1
         mv ${TABLE}.sql.tmp1 ${TABLE}.sql
 
     fi

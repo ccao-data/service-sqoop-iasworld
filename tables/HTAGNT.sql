@@ -65,5 +65,5 @@ CREATE TABLE `iasworld.htagnt`(
   `name2_companyname` varchar(205), 
   `agent_type` decimal(10,0), 
   `iasw_id` decimal(10,0))
-STORED AS PARQUET;
-        
+STORED AS PARQUET
+TBLPROPERTIES ('parquet.compression'='SNAPPY');

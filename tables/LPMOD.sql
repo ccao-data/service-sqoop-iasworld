@@ -21,5 +21,5 @@ CREATE TABLE `iasworld.lpmod`(
   `iasw_id` decimal(10,0), 
   `soiltble` varchar(30), 
   `schedtble` decimal(6,0))
-STORED AS PARQUET;
-        
+STORED AS PARQUET
+TBLPROPERTIES ('parquet.compression'='SNAPPY');

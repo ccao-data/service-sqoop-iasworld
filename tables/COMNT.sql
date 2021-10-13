@@ -13,5 +13,5 @@ CREATE TABLE `iasworld.comnt`(
   `upd_status` varchar(1), 
   `caseno` varchar(15), 
   `comnt2` string)
-STORED AS PARQUET;
-        
+STORED AS PARQUET
+TBLPROPERTIES ('parquet.compression'='SNAPPY');

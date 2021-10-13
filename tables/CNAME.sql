@@ -129,5 +129,5 @@ CREATE TABLE `iasworld.cname`(
   `vldrsc` varchar(20), 
   `addrvalid` varchar(1), 
   `skip_addr_validation` varchar(1))
-STORED AS PARQUET;
-        
+STORED AS PARQUET
+TBLPROPERTIES ('parquet.compression'='SNAPPY');

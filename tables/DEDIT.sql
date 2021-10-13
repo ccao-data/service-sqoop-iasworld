@@ -11,5 +11,5 @@ CREATE TABLE `iasworld.dedit`(
   `wen` string, 
   `longdesc` varchar(200), 
   `iasw_id` decimal(10,0))
-STORED AS PARQUET;
-        
+STORED AS PARQUET
+TBLPROPERTIES ('parquet.compression'='SNAPPY');
