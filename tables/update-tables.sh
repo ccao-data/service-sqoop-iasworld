@@ -32,6 +32,7 @@ for TABLE in ${TABLES}; do
     # bucketed table as a final location
     if [[ ${CONTAINS_TAXYR} == TRUE && ${NUM_BUCKETS} -gt 1 ]]; then
 
+        sed -i 's/`taxyr` decimal(4,0)/`taxyr` string/g' ${TABLE}.sql.tmp1
         cat ${TABLE}.sql.tmp1 | sed '/taxyr/d' > ${TABLE}.sql.tmp2
         sed -i "s/${TABLE_LC}/${TABLE_LC}\_bucketed/g" ${TABLE}.sql.tmp2
         echo "PARTITIONED BY (taxyr string)

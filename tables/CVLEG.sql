@@ -2,7 +2,7 @@ CREATE TABLE `iasworld.cvleg`(
   `conveyno` decimal(9,0), 
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `parseq` decimal(3,0), 
   `who` varchar(10), 
   `wen` string, 

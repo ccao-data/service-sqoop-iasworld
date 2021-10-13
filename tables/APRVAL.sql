@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.aprval`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
   `who` varchar(10), 

@@ -2,7 +2,7 @@ CREATE TABLE `iasworld.addn`(
   `jur` varchar(6), 
   `parid` varchar(30), 
   `card` decimal(4,0), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `lline` decimal(4,0), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 

@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.cvtran`(
   `jur` varchar(6), 
   `conveyno` decimal(9,0), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `who` varchar(10), 
   `wen` string, 
   `whocalc` varchar(10), 

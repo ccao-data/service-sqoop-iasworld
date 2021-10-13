@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.owndat`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `ownseq` decimal(3,0), 
   `po` decimal(1,0), 
   `seq` decimal(3,0), 

@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.cvown`(
   `jur` varchar(6), 
   `conveyno` decimal(9,0), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `ownseq` decimal(3,0), 
   `who` varchar(10), 
   `wen` string, 

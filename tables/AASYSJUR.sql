@@ -41,5 +41,3 @@ CREATE TABLE `iasworld.aasysjur`(
   `wen` string)
 STORED AS PARQUET;
         
-STORED AS PARQUET;
-        

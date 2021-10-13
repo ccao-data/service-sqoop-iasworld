@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.htpar`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `heartyp` varchar(1), 
   `subkey` decimal(3,0), 
   `seq` decimal(3,0), 

@@ -2,7 +2,7 @@ CREATE TABLE `iasworld.asmt_hist`(
   `jur` varchar(6), 
   `rolltype` varchar(10), 
   `parid` varchar(30), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `valyear` decimal(4,0), 
   `valclass` varchar(4), 
   `ovrclass` varchar(4), 

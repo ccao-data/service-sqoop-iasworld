@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.exdet`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `excode` varchar(6), 
   `lineno` decimal(3,0), 
   `seq` decimal(3,0), 

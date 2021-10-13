@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.land`(
   `jur` varchar(6), 
   `parid` varchar(30), 
-  `taxyr` decimal(4,0), 
+  `taxyr` string, 
   `lline` decimal(4,0), 
   `ltype` varchar(1), 
   `code` varchar(6), 
