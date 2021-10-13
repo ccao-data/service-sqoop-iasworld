@@ -403,7 +403,7 @@ CREATE TABLE `iasworld.exdet_bucketed`(
   `yrbase` decimal(4,0), 
   `begdt` string, 
   `enddt` string)
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 20 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

@@ -613,7 +613,7 @@ CREATE TABLE `iasworld.dweldat_bucketed`(
   `lumpcamod` decimal(10,5), 
   `bld_modelid` varchar(80), 
   `ovrmraval` decimal(10,0))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 10 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

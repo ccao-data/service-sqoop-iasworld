@@ -116,6 +116,6 @@ CREATE TABLE `iasworld.splcom`(
   `seq` decimal(3,0), 
   `splcom_status` varchar(1), 
   `alt_splitnum` decimal(15,0))
-PARTITIONED BY (taxyr string)
+PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

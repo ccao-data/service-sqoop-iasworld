@@ -387,7 +387,7 @@ CREATE TABLE `iasworld.cvleg_bucketed`(
   `user58` varchar(80), 
   `user59` varchar(80), 
   `user60` varchar(80))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 10 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

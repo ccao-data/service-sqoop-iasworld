@@ -643,7 +643,7 @@ CREATE TABLE `iasworld.asmt_all_bucketed`(
   `ovrval60` decimal(10,0), 
   `val60` decimal(10,0), 
   `splitno` decimal(15,0))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 30 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 30 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

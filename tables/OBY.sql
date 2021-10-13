@@ -149,10 +149,10 @@ CREATE TABLE `iasworld.oby_bucketed`(
   `cubicft` decimal(10,0), 
   `miles` decimal(7,3), 
   `grade` varchar(1), 
-  `oby_bucketedmod1` varchar(3), 
-  `oby_bucketedmod2` varchar(3), 
-  `oby_bucketedmod3` varchar(3), 
-  `oby_bucketedmod4` varchar(3), 
+  `obymod1` varchar(3), 
+  `obymod2` varchar(3), 
+  `obymod3` varchar(3), 
+  `obymod4` varchar(3), 
   `cond` varchar(1), 
   `funct` varchar(1), 
   `mktadj` decimal(5,2), 
@@ -176,7 +176,7 @@ CREATE TABLE `iasworld.oby_bucketed`(
   `areasum` decimal(10,0), 
   `exmppct` decimal(5,2), 
   `exmpval` decimal(10,0), 
-  `convoby_bucketed` decimal(10,0), 
+  `convoby` decimal(10,0), 
   `rateovr` decimal(10,2), 
   `chgrsn` varchar(2), 
   `cndflag` varchar(1), 
@@ -251,7 +251,7 @@ CREATE TABLE `iasworld.oby_bucketed`(
   `cubicmeters` decimal(12,3), 
   `area_sqm` decimal(11,3), 
   `bld_modelid` varchar(80))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 10 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

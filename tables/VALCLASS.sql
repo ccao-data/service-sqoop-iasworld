@@ -27,6 +27,6 @@ CREATE TABLE `iasworld.valclass`(
   `user14` varchar(20), 
   `user15` varchar(20), 
   `iasw_id` decimal(10,0))
-PARTITIONED BY (taxyr string)
+PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

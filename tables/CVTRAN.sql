@@ -355,7 +355,7 @@ CREATE TABLE `iasworld.cvtran_bucketed`(
   `own2_suffix` varchar(20), 
   `own2_companyname` varchar(205), 
   `notes` string)
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 10 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

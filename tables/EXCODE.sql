@@ -231,6 +231,6 @@ CREATE TABLE `iasworld.excode`(
   `userval3` decimal(10,0), 
   `userval4` decimal(10,0), 
   `userval5` decimal(10,0))
-PARTITIONED BY (taxyr string)
+PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

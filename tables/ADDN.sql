@@ -131,7 +131,7 @@ CREATE TABLE `iasworld.addn_bucketed`(
   `rcnld1` decimal(10,0), 
   `rcnld2` decimal(10,0), 
   `rcnld3` decimal(10,0), 
-  `convaddn_bucketed` decimal(10,0), 
+  `convaddn` decimal(10,0), 
   `chgrsn` varchar(2), 
   `deactivat` string, 
   `salekey` decimal(8,0), 
@@ -159,7 +159,7 @@ CREATE TABLE `iasworld.addn_bucketed`(
   `userval4` decimal(10,0), 
   `userval5` decimal(10,0), 
   `area_sqm` decimal(11,3))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 10 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

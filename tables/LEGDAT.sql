@@ -297,7 +297,7 @@ CREATE TABLE `iasworld.legdat_bucketed`(
   `user58` varchar(80), 
   `user59` varchar(80), 
   `user60` varchar(80))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 20 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

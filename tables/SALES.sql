@@ -268,6 +268,6 @@ CREATE TABLE `iasworld.sales_bucketed`(
   `note7` varchar(800), 
   `grp` varchar(15), 
   `parent` varchar(10))
-CLUSTERED BY (parid) SORTED BY (seq) INTO 30 BUCKETS
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 30 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

@@ -152,6 +152,6 @@ CREATE TABLE `iasworld.comintext`(
   `wallhgt_m` decimal(6,3), 
   `perim_m` decimal(9,3), 
   `area_sqm` decimal(11,3))
-PARTITIONED BY (taxyr string)
+PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

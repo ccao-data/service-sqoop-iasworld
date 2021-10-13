@@ -34,9 +34,9 @@ for TABLE in ${TABLES}; do
 
         sed -i 's/`taxyr` decimal(4,0)/`taxyr` string/g' ${TABLE}.sql.tmp1
         cat ${TABLE}.sql.tmp1 | sed '/taxyr/d' > ${TABLE}.sql.tmp2
-        sed -i "s/${TABLE_LC}/${TABLE_LC}\_bucketed/g" ${TABLE}.sql.tmp2
-        echo "PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
+        sed -i "/^CREATE TABLE/s/${TABLE_LC}/${TABLE_LC}\_bucketed/" ${TABLE}.sql.tmp2
+        echo "PARTITIONED BY (\`taxyr\` string)
+CLUSTERED BY (\`parid\`) SORTED BY (\`seq\`) INTO ${NUM_BUCKETS} BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \
@@ -52,7 +52,7 @@ TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
     elif [[ ${CONTAINS_TAXYR} == TRUE && ! ${NUM_BUCKETS} -gt 1 ]]; then
 
         cat ${TABLE}.sql.tmp1 | sed '/taxyr/d' > ${TABLE}.sql.tmp2
-        echo "PARTITIONED BY (taxyr string)
+        echo "PARTITIONED BY (\`taxyr\` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \
@@ -65,7 +65,7 @@ TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
 
         cp ${TABLE}.sql.tmp1 ${TABLE}.sql.tmp2
         sed -i "s/${TABLE_LC}/${TABLE_LC}\_bucketed/g" ${TABLE}.sql.tmp2
-        echo "CLUSTERED BY (parid) SORTED BY (seq) INTO ${NUM_BUCKETS} BUCKETS
+        echo "CLUSTERED BY (\`parid\`) SORTED BY (\`seq\`) INTO ${NUM_BUCKETS} BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \

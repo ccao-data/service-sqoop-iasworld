@@ -635,7 +635,7 @@ CREATE TABLE `iasworld.htpar_bucketed`(
   `userval3` decimal(10,0), 
   `userval4` decimal(10,0), 
   `userval5` decimal(10,0))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 15 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 15 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

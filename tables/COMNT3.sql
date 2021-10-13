@@ -15,6 +15,6 @@ CREATE TABLE `iasworld.comnt3`(
   `bldgno` varchar(10), 
   `unit` varchar(10), 
   `comnt2` string)
-PARTITIONED BY (taxyr string)
+PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

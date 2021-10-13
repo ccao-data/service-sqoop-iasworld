@@ -443,7 +443,7 @@ CREATE TABLE `iasworld.pardat_bucketed`(
   `userval9` decimal(10,0), 
   `userval10` decimal(10,0), 
   `skip_addr_validation` varchar(1))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 20 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

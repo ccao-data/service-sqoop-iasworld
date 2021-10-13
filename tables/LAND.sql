@@ -242,7 +242,7 @@ CREATE TABLE `iasworld.land_bucketed`(
   `suppress` varchar(1), 
   `lumpcamod` decimal(10,5), 
   `hectares` decimal(12,4), 
-  `convland_bucketed` decimal(10,0), 
+  `convland` decimal(10,0), 
   `soil` varchar(30), 
   `soilflg` varchar(1), 
   `user11` varchar(20), 
@@ -301,7 +301,7 @@ CREATE TABLE `iasworld.land_bucketed`(
   `user33` varchar(80), 
   `user34` varchar(80), 
   `user35` varchar(80))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 20 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

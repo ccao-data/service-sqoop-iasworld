@@ -53,6 +53,6 @@ CREATE TABLE `iasworld.comfeat`(
   `meas3_m` decimal(13,3), 
   `meas4_m` decimal(13,3), 
   `meas5_m` decimal(13,3))
-PARTITIONED BY (taxyr string)
+PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

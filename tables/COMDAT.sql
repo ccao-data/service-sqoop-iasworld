@@ -287,7 +287,7 @@ CREATE TABLE `iasworld.comdat_bucketed`(
   `userval5` decimal(10,0), 
   `bld_modelid` varchar(80), 
   `ovrmraval` decimal(10,0))
-PARTITIONED BY (taxyr string)
-CLUSTERED BY (parid) SORTED BY (seq) INTO 10 BUCKETS
+PARTITIONED BY (`taxyr` string)
+CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');
