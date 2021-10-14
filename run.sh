@@ -91,45 +91,33 @@ LOG_STREAM_NAME="sqoop-job-log-$(date -u +'%Y-%m-%d_%H-%M-%S')"
     --log-stream-name ${LOG_STREAM_NAME}
 
 # Convert text output from Docker and AWS CLI to clean JSON
-# for upload to AWS CloudWatch. If the file length is greater than
-# 10000, then we need to upload in chunks
-if [[ $(cat ${TEMP_LOG_FILE} | wc -l) -le 10000 ]]; then
-    # Parse logs and upload to CloudWatch
-    parse_logs ${TEMP_LOG_FILE} ${TEMP_LOG_FILE}.json
-    /usr/bin/aws logs put-log-events \
-        --log-group-name ${LOG_GROUP_NAME} \
-        --log-stream-name ${LOG_STREAM_NAME} \
-        --log-events file://${TEMP_LOG_FILE}.json
-    echo "Logs successfully uploaded to CloudWatch"
-else
-    # Split logs, parse, then upload in chunks. First loop skips using
-    # generated sequence token
-    COUNTER=1
-    split -l 9000 ${TEMP_LOG_FILE} logs/temp-sqoop-log-
-    for f in logs/temp-sqoop-log-*; do
-        parse_logs ${f} ${f}.json
-        if [[ ${COUNTER} -eq 1 ]]; then
-            SEQ_TOKEN=$(
-                /usr/bin/aws logs put-log-events \
-                    --log-group-name ${LOG_GROUP_NAME} \
-                    --log-stream-name ${LOG_STREAM_NAME} \
-                    --log-events file://${f}.json \
-                | jq -r .nextSequenceToken
-            )
-        else
-            SEQ_TOKEN=$(
-                /usr/bin/aws logs put-log-events \
-                    --log-group-name ${LOG_GROUP_NAME} \
-                    --log-stream-name ${LOG_STREAM_NAME} \
-                    --log-events file://${f}.json \
-                    --sequence-token ${SEQ_TOKEN} \
-                | jq -r .nextSequenceToken
-            )
-        fi
-        COUNTER=$((COUNTER + 1))
-    done
-    echo "Logs successfully uploaded to CloudWatch"
-fi
+# for upload to AWS CloudWatch. Logs need to be split into chunks for upload
+# First loop skips using sequence token necessary for subsequent uploads
+COUNTER=1
+split -l 4000 ${TEMP_LOG_FILE} logs/temp-sqoop-log-
+for f in logs/temp-sqoop-log-*; do
+    parse_logs ${f} ${f}.json
+    if [[ ${COUNTER} -eq 1 ]]; then
+        SEQ_TOKEN=$(
+            /usr/bin/aws logs put-log-events \
+                --log-group-name ${LOG_GROUP_NAME} \
+                --log-stream-name ${LOG_STREAM_NAME} \
+                --log-events file://${f}.json \
+            | jq -r .nextSequenceToken
+        )
+    else
+        SEQ_TOKEN=$(
+            /usr/bin/aws logs put-log-events \
+                --log-group-name ${LOG_GROUP_NAME} \
+                --log-stream-name ${LOG_STREAM_NAME} \
+                --log-events file://${f}.json \
+                --sequence-token ${SEQ_TOKEN} \
+            | jq -r .nextSequenceToken
+        )
+    fi
+    COUNTER=$((COUNTER + 1))
+done
+echo "Logs successfully uploaded to CloudWatch"
 
 # Remove uploaded log files
 rm ${TEMP_LOG_FILE}*
