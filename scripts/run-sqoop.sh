@@ -38,7 +38,7 @@ for TABLE in ${JOB_TABLES}; do
     QUERY_YEAR=$(echo ${IPTS_TABLE} | grep -Po "(?<=${TABLE}.)[0-9]{4}")
     QUERY_COND=$(echo ${IPTS_TABLE} | grep -Po "(?<=${TABLE})[<>=]")
     if [[ -z ${QUERY_YEAR} && -z ${QUERY_COND} ]]; then
-        NUM_MAPPERS=$(($(date +%Y) - 1999))
+        NUM_MAPPERS=$(($(date +%Y) - 1998))
         BOUNDARY_QUERY="SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}"
         QUERY="SELECT * FROM IASWORLD.${TABLE}
                WHERE \$CONDITIONS"
@@ -47,7 +47,7 @@ for TABLE in ${JOB_TABLES}; do
         if [[ ${QUERY_COND} == \> ]]; then
             NUM_MAPPERS=$(($(date +%Y) - ${QUERY_YEAR}))
         elif [[ ${QUERY_COND} == \< ]]; then
-            NUM_MAPPERS=$((${QUERY_YEAR} - 1999))
+            NUM_MAPPERS=$((${QUERY_YEAR} - 1998))
         else
             NUM_MAPPERS=1
         fi

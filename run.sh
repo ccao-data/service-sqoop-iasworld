@@ -19,6 +19,7 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
 
 # Drop existing keys on S3 for any pulled tables. Will only drop folders for
 # which there are local taxyr replacements
+find target/ -maxdepth 1 -type d -empty -delete
 TABLES_EXTRACTED=$(ls target/)
 for TABLE in ${TABLES_EXTRACTED}; do
     SUB_DIRS=$(find target/${TABLE}/* -maxdepth 1 -type d -exec basename {} \;)
