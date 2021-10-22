@@ -38,9 +38,21 @@ for TABLE in ${JOB_TABLES}; do
     QUERY_YEAR=$(echo ${IPTS_TABLE} | grep -Po "(?<=${TABLE}.)[0-9]{4}")
     QUERY_COND=$(echo ${IPTS_TABLE} | grep -Po "(?<=${TABLE})[<>=]")
     if [[ -z ${QUERY_YEAR} && -z ${QUERY_COND} ]]; then
+        NUM_MAPPERS=$(($(date +%Y) - 1999))
+        BOUNDARY_QUERY="SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}"
         QUERY="SELECT * FROM IASWORLD.${TABLE}
                WHERE \$CONDITIONS"
     else
+        # Make number of mappers roughly equal to number of tax years
+        if [[ ${QUERY_COND} == \> ]]; then
+            NUM_MAPPERS=$(($(date +%Y) - ${QUERY_YEAR}))
+        elif [[ ${QUERY_COND} == \< ]]; then
+            NUM_MAPPERS=$((${QUERY_YEAR} - 1999))
+        else
+            NUM_MAPPERS=1
+        fi
+        BOUNDARY_QUERY="SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}
+                        WHERE TAXYR ${QUERY_COND} ${QUERY_YEAR}"
         QUERY="SELECT * FROM IASWORLD.${TABLE}
                WHERE TAXYR ${QUERY_COND} ${QUERY_YEAR}
                AND \$CONDITIONS"
@@ -66,14 +78,20 @@ for TABLE in ${JOB_TABLES}; do
     # Create a sqoop job for the selected table(s). Tables with TAXYR
     # get partitioning and splitby during sqoop import
     if [[ ${CONTAINS_TAXYR} == TRUE ]]; then
-        sqoop "${SQOOP_OPTIONS_MAIN[@]}" --split-by TAXYR --num-mappers 16
+        sqoop "${SQOOP_OPTIONS_MAIN[@]}" \
+            --boundary-query "${BOUNDARY_QUERY}" \
+            --split-by TAXYR \
+            --num-mappers ${NUM_MAPPERS}
     else
         sqoop "${SQOOP_OPTIONS_MAIN[@]}" -m 1
     fi
 
     # Execute saved sqoop job
     echo "Running job for table: ${TABLE} with query: ${QUERY}"
-    sqoop job --exec ${TABLE}
+    sqoop job \
+        -D java.security.egd=file:///dev/./urandom \
+        -D mapred.child.java.opts="-Djava.security.egd=file:///dev/./urandom" \
+        --exec ${TABLE}
 
     # If buckets are specified, rewrite output from sqoop to bucketed table
     # Then copy from distributed file system (HDFS) to local mounted dir
