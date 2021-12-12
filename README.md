@@ -59,10 +59,10 @@ Table extractions are schedule via [`cron`](https://man7.org/linux/man-pages/man
 
 ```bash
 # Extract recent years from frequently used tables on weekdays at 1 AM CST
-0 6 * * 1,2,4,5 cd /local/path/to/repo && YEAR="$(($(date '+\%Y') - 2))" IPTS_TABLE="ADDN>$YEAR APRVAL>$YEAR ASMT_HIST>$YEAR ASMT_ALL>$YEAR COMDAT>$YEAR DWELDAT>$YEAR HTPAR>$YEAR LEGDAT>$YEAR OBY>$YEAR OWNDAT>$YEAR PARDAT>$YEAR SALES SPLCOM>$YEAR" /bin/bash ./run.sh
+0 6 * * 1,2,3,4,5 cd /local/path/to/repo && YEAR="$(($(date '+\%Y') - 2))" IPTS_TABLE="ADDN>$YEAR APRVAL>$YEAR ASMT_HIST>$YEAR ASMT_ALL>$YEAR COMDAT>$YEAR CVLEG>$YEAR DWELDAT>$YEAR HTPAR>$YEAR LEGDAT>$YEAR OBY>$YEAR OWNDAT>$YEAR PARDAT>$YEAR SALES SPLCOM>$YEAR" /bin/bash ./run.sh
 
 # Extract all tables on Wednesday and Saturday at 1 AM CST
-0 6 * * 3,6 cd /local/path/to/repo && /bin/bash ./run.sh
+0 6 * * 6 cd /local/path/to/repo && /bin/bash ./run.sh
 ```
 
 ## Useful Resources
