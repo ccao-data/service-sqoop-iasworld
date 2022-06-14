@@ -72,7 +72,7 @@ for TABLE in ${JOB_TABLES}; do
     )
 
     # Create the Hive tables necessary to run sqoop jobs
-    # Table definitions are stores in the repo
+    # Table definitions are stored in the repo
     hive -f /tmp/tables/${TABLE}.sql
 
     # Create a sqoop job for the selected table(s). Tables with TAXYR
