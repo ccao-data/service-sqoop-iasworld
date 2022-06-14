@@ -4,3 +4,4 @@ secrets/
 target/
 logs/
 backup/
+*.java
