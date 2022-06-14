@@ -30,12 +30,13 @@ for TABLE in ${JOB_TABLES}; do
         --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS FETCH FIRST 1 ROWS ONLY" \
         --hcatalog-database ${DB_NAME} \
         --hcatalog-table ${TABLE} \
-        --drop-and-create-hcatalog-table
+        --drop-and-create-hcatalog-table \
+        --num-mappers 1
     )
 
     echo "Running job for table: ${TABLE}"
     hive -e "CREATE TABLE ${DB_NAME}.${TABLE_LC}(jur string)"
-    sqoop "${SQOOP_OPTIONS_MAIN[@]}" -m 1
+    sqoop "${SQOOP_OPTIONS_MAIN[@]}"
 
     # Execute saved sqoop job
     sqoop job --exec ${TABLE}
