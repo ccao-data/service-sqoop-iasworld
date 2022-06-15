@@ -7,7 +7,7 @@ CREATE TABLE `iasworld.dedit`(
   `val2` varchar(20), 
   `msg` varchar(40), 
   `shortdesc` varchar(15), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `longdesc` varchar(200), 
   `iasw_id` decimal(10,0))

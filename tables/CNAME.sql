@@ -3,7 +3,7 @@ CREATE TABLE `iasworld.cname`(
   `ownnum` varchar(20), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `name1` varchar(205), 
   `name2` varchar(205), 

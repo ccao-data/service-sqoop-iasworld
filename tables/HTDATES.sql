@@ -3,7 +3,7 @@ CREATE TABLE `iasworld.htdates`(
   `parid` varchar(30), 
   `heartyp` varchar(1), 
   `subkey` decimal(3,0), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `schdte` string, 
   `schtime` decimal(4,0), 

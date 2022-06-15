@@ -7,7 +7,7 @@ CREATE TABLE `iasworld.addrindx`(
   `tabseq` decimal(3,0), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `adrpre` varchar(10), 
   `adrno` decimal(10,0), 

@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.cvtran`(
   `jur` varchar(6), 
   `conveyno` decimal(9,0), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
@@ -181,7 +181,7 @@ STORED AS RCFILE;
 CREATE TABLE `iasworld.cvtran_bucketed`(
   `jur` varchar(6), 
   `conveyno` decimal(9,0), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 

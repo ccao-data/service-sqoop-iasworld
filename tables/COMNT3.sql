@@ -6,7 +6,7 @@ CREATE TABLE `iasworld.comnt3`(
   `linkid` decimal(10,2), 
   `code` varchar(4), 
   `comnt` varchar(80), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `status` varchar(1), 
   `iasw_id` decimal(10,0), 

@@ -6,7 +6,7 @@ CREATE TABLE `iasworld.splcom`(
   `newid` varchar(30), 
   `splitno` decimal(15,0), 
   `splitcde` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `status` varchar(1), 
   `oldbook` varchar(8), 

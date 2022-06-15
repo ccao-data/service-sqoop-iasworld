@@ -4,7 +4,7 @@ CREATE TABLE `iasworld.dweldat`(
   `card` decimal(4,0), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
@@ -301,9 +301,18 @@ CREATE TABLE `iasworld.dweldat`(
   `stage` decimal(5,0), 
   `excess` varchar(1), 
   `suppress` varchar(1), 
-  `lumpcamod` decimal(10,5), 
+  `lumpcamod` decimal(15,5), 
   `bld_modelid` varchar(80), 
-  `ovrmraval` decimal(10,0),
+  `ovrmraval` decimal(10,0), 
+  `renolvl` varchar(30), 
+  `prior_renolvl` varchar(30), 
+  `renopoint` decimal(10,0), 
+  `renoovr` varchar(30), 
+  `renoyr` decimal(4,0), 
+  `mvpbsmt` decimal(6,0), 
+  `mvpunfin` decimal(6,0), 
+  `mvpsf` decimal(6,0), 
+  `mvpattic` decimal(6,0),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -313,7 +322,7 @@ CREATE TABLE `iasworld.dweldat_bucketed`(
   `card` decimal(4,0), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
@@ -610,9 +619,18 @@ CREATE TABLE `iasworld.dweldat_bucketed`(
   `stage` decimal(5,0), 
   `excess` varchar(1), 
   `suppress` varchar(1), 
-  `lumpcamod` decimal(10,5), 
+  `lumpcamod` decimal(15,5), 
   `bld_modelid` varchar(80), 
-  `ovrmraval` decimal(10,0))
+  `ovrmraval` decimal(10,0), 
+  `renolvl` varchar(30), 
+  `prior_renolvl` varchar(30), 
+  `renopoint` decimal(10,0), 
+  `renoovr` varchar(30), 
+  `renoyr` decimal(4,0), 
+  `mvpbsmt` decimal(6,0), 
+  `mvpunfin` decimal(6,0), 
+  `mvpsf` decimal(6,0), 
+  `mvpattic` decimal(6,0))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET

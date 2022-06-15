@@ -1,7 +1,7 @@
 CREATE TABLE `iasworld.htagnt`(
   `jur` varchar(6), 
   `agent` varchar(6), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `status` varchar(1), 
   `name1` varchar(205), 

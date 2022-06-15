@@ -5,7 +5,7 @@ CREATE TABLE `iasworld.comnt`(
   `code` varchar(4), 
   `comntstat` varchar(3), 
   `comnt` varchar(80), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `status` varchar(1), 
   `iasw_id` decimal(10,0), 

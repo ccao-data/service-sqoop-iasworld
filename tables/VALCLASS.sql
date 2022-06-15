@@ -5,7 +5,7 @@ CREATE TABLE `iasworld.valclass`(
   `class` varchar(4), 
   `luc` varchar(4), 
   `vclass` varchar(4), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `ratio1` decimal(7,4), 
   `ratio2` decimal(7,4), 

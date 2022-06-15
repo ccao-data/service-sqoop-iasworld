@@ -5,7 +5,7 @@ CREATE TABLE `iasworld.comfeat`(
   `lline` decimal(4,0), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 

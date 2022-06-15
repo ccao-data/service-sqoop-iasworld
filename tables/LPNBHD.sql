@@ -4,7 +4,7 @@ CREATE TABLE `iasworld.lpnbhd`(
   `nbhd` varchar(8), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `describ` varchar(40), 
   `landfact` decimal(6,4), 

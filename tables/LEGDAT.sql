@@ -3,7 +3,7 @@ CREATE TABLE `iasworld.legdat`(
   `parid` varchar(30), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
@@ -145,7 +145,9 @@ CREATE TABLE `iasworld.legdat`(
   `user57` varchar(80), 
   `user58` varchar(80), 
   `user59` varchar(80), 
-  `user60` varchar(80),
+  `user60` varchar(80), 
+  `schdist2` varchar(5), 
+  `schvalpct2` decimal(9,6),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -154,7 +156,7 @@ CREATE TABLE `iasworld.legdat_bucketed`(
   `parid` varchar(30), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
@@ -296,7 +298,9 @@ CREATE TABLE `iasworld.legdat_bucketed`(
   `user57` varchar(80), 
   `user58` varchar(80), 
   `user59` varchar(80), 
-  `user60` varchar(80))
+  `user60` varchar(80), 
+  `schdist2` varchar(5), 
+  `schvalpct2` decimal(9,6))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

@@ -6,7 +6,7 @@ CREATE TABLE `iasworld.land`(
   `code` varchar(6), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
@@ -87,7 +87,7 @@ CREATE TABLE `iasworld.land`(
   `card` decimal(4,0), 
   `excess` varchar(1), 
   `suppress` varchar(1), 
-  `lumpcamod` decimal(10,5), 
+  `lumpcamod` decimal(15,5), 
   `hectares` decimal(12,4), 
   `convland` decimal(10,0), 
   `soil` varchar(30), 
@@ -147,7 +147,9 @@ CREATE TABLE `iasworld.land`(
   `user32` varchar(80), 
   `user33` varchar(80), 
   `user34` varchar(80), 
-  `user35` varchar(80),
+  `user35` varchar(80), 
+  `soilmod` varchar(30), 
+  `schedmod` decimal(6,0),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -159,7 +161,7 @@ CREATE TABLE `iasworld.land_bucketed`(
   `code` varchar(6), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `whocalc` varchar(10), 
   `wencalc` string, 
@@ -240,7 +242,7 @@ CREATE TABLE `iasworld.land_bucketed`(
   `card` decimal(4,0), 
   `excess` varchar(1), 
   `suppress` varchar(1), 
-  `lumpcamod` decimal(10,5), 
+  `lumpcamod` decimal(15,5), 
   `hectares` decimal(12,4), 
   `convland` decimal(10,0), 
   `soil` varchar(30), 
@@ -300,7 +302,9 @@ CREATE TABLE `iasworld.land_bucketed`(
   `user32` varchar(80), 
   `user33` varchar(80), 
   `user34` varchar(80), 
-  `user35` varchar(80))
+  `user35` varchar(80), 
+  `soilmod` varchar(30), 
+  `schedmod` decimal(6,0))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

@@ -11,7 +11,7 @@ CREATE TABLE `iasworld.lpmod`(
   `brate` decimal(10,0), 
   `bincr` decimal(10,0), 
   `bdecr` decimal(10,0), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `depthtble` varchar(3), 
   `modtype` varchar(10), 

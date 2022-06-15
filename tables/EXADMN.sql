@@ -4,7 +4,7 @@ CREATE TABLE `iasworld.exadmn`(
   `caseno` varchar(15), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `who` varchar(10), 
+  `who` varchar(50), 
   `wen` string, 
   `status` varchar(1), 
   `rectype` varchar(6), 
