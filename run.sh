@@ -3,6 +3,7 @@ START_TIME=`date +%s`
 
 # Env variables controlling where sqooped data is exported to
 TEMP_LOG_FILE="logs/temp-sqoop-log"
+BACKUP_LOG_FILE="logs/backup-sqoop-log"
 BUCKET_URI="s3://ccao-data-warehouse-us-east-1"
 LOG_GROUP_NAME="/ccao/jobs/sqoop"
 
@@ -121,4 +122,5 @@ done
 echo "Logs successfully uploaded to CloudWatch"
 
 # Remove uploaded log files
+mv ${TEMP_LOG_FILE} ${BACKUP_LOG_FILE}
 rm ${TEMP_LOG_FILE}*
