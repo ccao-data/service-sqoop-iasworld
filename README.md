@@ -40,6 +40,10 @@ The rest of the dependencies for `sqoop` are installed using the included `Docke
 - `docker-compose pull` - Grabs the latest image from the CCAO GitLab registry, if it exists
 - `docker-compose build` - Builds the `sqoop` image from the included `Dockerfile` 
 
+### Update table schemas
+
+If tables schemas are altered in iasWorld (column type change, new columns) the associated table schema files will need to be updated in order to extract the altered tables from iasWorld. If new tables have been added, they must be added to `tables-list.csv`, then all  schemas can be updated by changing `/tmp/scripts/run-sqoop.sh` to `/tmp/scripts/get-tables.sh` in `docker-compose.yaml` and running `docker compose up`. Once this has been done, the cron job detailed below needs to be updated with any new tables and run.
+
 ### Export Tables
 
 Nearly all the functionality of this repository is contained in `run.sh`. This script will complete four main tasks:
