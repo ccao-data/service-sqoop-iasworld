@@ -4,22 +4,22 @@ This repository contains the dependencies and scripts necessary to run [`sqoop`]
 
 In this case, `sqoop` is used to export table dumps from iasWorld, the CCAO's system of record, to an [HCatalog](https://cwiki.apache.org/confluence/display/Hive/HCatalog). The result is a set of partitioned and bucketed Parquet files which can be uploaded to [AWS S3](https://aws.amazon.com/s3/) and queried directly via [AWS Athena](https://aws.amazon.com/athena).
 
-## Structure 
+## Structure
 
-### Directories 
+### Directories
 
 - `docker-config/` - Configuration and setup files for the Hadoop/Hive backend. Used during Docker build only
 - `drivers/` - Mounted during run to provide connection drivers to `sqoop`. Put OJDBC files here (`ojdbc8.jar` or `ojdbc7.jar`)
-- `logs/` - Location of temporary log files. Logs are manually uploaded to AWS CloudWatch after each run is complete 
+- `logs/` - Location of temporary log files. Logs are manually uploaded to AWS CloudWatch after each run is complete
 - `scripts/` - Runtime scripts to run `sqoop` jobs within Docker
 - `secrets/` - Mounted during run to provide DB password via a file. Alter `secrets/IPTS_PASSWORD` to contain your password
-- `tables/` - Table definitions and metadata used to create Hive tables for `sqoop` to extract to. Manually stored since certain tables include paritioning and bucketing 
+- `tables/` - Table definitions and metadata used to create Hive tables for `sqoop` to extract to. Manually stored since certain tables include paritioning and bucketing
 - `target/` - Mounted during run as output directory. All parquet files and job artifacts are saved temporarily before being uploaded to S3
 
 ### Important Files
 
 - `Dockerfile` - Dockerfile to build `sqoop` and all dependencies from scratch if unavailable via the GitLab container registry
-- `run.sh` - Main entrypoint script. Idempotent. Run with `sudo ./run.sh` to extract all iasWorld tables. 
+- `run.sh` - Main entrypoint script. Idempotent. Run with `sudo ./run.sh` to extract all iasWorld tables.
 - `docker-compose.yaml` - Defines the containers and environment needed to run `sqoop` jobs in a small, distributed Hadoop/Hive environment
 - `.env` - Contains DB connection details. Alter before running to provide your own details
 
@@ -33,16 +33,22 @@ You will need the following tools installed before using this repo:
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) - Authenticated using `aws configure`
 - [moreutils](http://joeyh.name/code/moreutils/) - For the `ts` timestamp command
-- [jq](https://stedolan.github.io/jq/) - To parse logs to JSON 
+- [jq](https://stedolan.github.io/jq/) - To parse logs to JSON
 
 The rest of the dependencies for `sqoop` are installed using the included `Dockerfile`. To retrieve them, run either of the following commands within the repo directory:
 
 - `docker-compose pull` - Grabs the latest image from the CCAO GitLab registry, if it exists
-- `docker-compose build` - Builds the `sqoop` image from the included `Dockerfile` 
+- `docker-compose build` - Builds the `sqoop` image from the included `Dockerfile`
 
 ### Update table schemas
 
-If tables schemas are altered in iasWorld (column type change, new columns) the associated table schema files will need to be updated in order to extract the altered tables from iasWorld. If new tables have been added, they must be added to `tables-list.csv`, then all  schemas can be updated by changing `/tmp/scripts/run-sqoop.sh` to `/tmp/scripts/get-tables.sh` in `docker-compose.yaml` and running `docker compose up`. Once this has been done, the cron job detailed below needs to be updated with any new tables and run.
+If tables schemas are altered in iasWorld (column type change, new columns), then the associated table schema files need to be updated in order to extract the altered tables from iasWorld. To update the schema files:
+
+1. (Optional) If new tables have been added, they must be added to `tables/tables-list.csv`
+2. Change `/tmp/scripts/run-sqoop.sh` to `/tmp/scripts/get-tables.sh` in `docker-compose.yaml`
+3. Run `docker compose up` and wait for the schema files (`tables/$TABLE.sql`) to update
+4. Run `./update-tables.sh` to add bucketing and paritioning to the table schemas
+5. Update the cron job in the README with any new tables, as well as the actual cronjob using `sudo crontab -e`
 
 ### Export Tables
 
