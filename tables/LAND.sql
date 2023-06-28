@@ -149,7 +149,20 @@ CREATE TABLE `iasworld.land`(
   `user34` varchar(80), 
   `user35` varchar(80), 
   `soilmod` varchar(30), 
-  `schedmod` decimal(6,0),
+  `schedmod` decimal(6,0), 
+  `user36` varchar(250), 
+  `user37` varchar(250), 
+  `user38` varchar(250), 
+  `user39` varchar(250), 
+  `user40` varchar(250), 
+  `udate1` string, 
+  `udate2` string, 
+  `udate3` string, 
+  `udate4` string, 
+  `udate5` string, 
+  `landid` varchar(30), 
+  `cerrate` decimal(5,2), 
+  `ovrnbhd` varchar(8),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -304,7 +317,20 @@ CREATE TABLE `iasworld.land_bucketed`(
   `user34` varchar(80), 
   `user35` varchar(80), 
   `soilmod` varchar(30), 
-  `schedmod` decimal(6,0))
+  `schedmod` decimal(6,0), 
+  `user36` varchar(250), 
+  `user37` varchar(250), 
+  `user38` varchar(250), 
+  `user39` varchar(250), 
+  `user40` varchar(250), 
+  `udate1` string, 
+  `udate2` string, 
+  `udate3` string, 
+  `udate4` string, 
+  `udate5` string, 
+  `landid` varchar(30), 
+  `cerrate` decimal(5,2), 
+  `ovrnbhd` varchar(8))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

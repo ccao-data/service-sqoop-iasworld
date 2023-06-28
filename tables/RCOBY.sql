@@ -40,7 +40,7 @@ CREATE TABLE `iasworld.rcoby`(
   `altbasedate` string, 
   `iasw_id` decimal(10,0), 
   `incuse` varchar(6), 
-  `obygrp` varchar(2), 
+  `obygrp` varchar(6), 
   `r10` decimal(10,0), 
   `dim1` varchar(5), 
   `dim2` varchar(5), 

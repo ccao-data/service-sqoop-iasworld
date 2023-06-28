@@ -21,10 +21,10 @@ CREATE TABLE `iasworld.oby`(
   `cubicft` decimal(10,0), 
   `miles` decimal(7,3), 
   `grade` varchar(1), 
-  `obymod1` varchar(3), 
-  `obymod2` varchar(3), 
-  `obymod3` varchar(3), 
-  `obymod4` varchar(3), 
+  `obymod1` varchar(4), 
+  `obymod2` varchar(4), 
+  `obymod3` varchar(4), 
+  `obymod4` varchar(4), 
   `cond` varchar(1), 
   `funct` varchar(1), 
   `mktadj` decimal(5,2), 
@@ -124,7 +124,12 @@ CREATE TABLE `iasworld.oby`(
   `area_sqm` decimal(11,3), 
   `bld_modelid` varchar(80), 
   `incuse` varchar(6), 
-  `proprate` varchar(2),
+  `proprate` varchar(3), 
+  `user21` varchar(250), 
+  `rcnfact` decimal(7,5), 
+  `obygrp` varchar(6), 
+  `ovrnbhd` varchar(8), 
+  `effageovr` decimal(4,0),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -151,10 +156,10 @@ CREATE TABLE `iasworld.oby_bucketed`(
   `cubicft` decimal(10,0), 
   `miles` decimal(7,3), 
   `grade` varchar(1), 
-  `obymod1` varchar(3), 
-  `obymod2` varchar(3), 
-  `obymod3` varchar(3), 
-  `obymod4` varchar(3), 
+  `obymod1` varchar(4), 
+  `obymod2` varchar(4), 
+  `obymod3` varchar(4), 
+  `obymod4` varchar(4), 
   `cond` varchar(1), 
   `funct` varchar(1), 
   `mktadj` decimal(5,2), 
@@ -254,7 +259,12 @@ CREATE TABLE `iasworld.oby_bucketed`(
   `area_sqm` decimal(11,3), 
   `bld_modelid` varchar(80), 
   `incuse` varchar(6), 
-  `proprate` varchar(2))
+  `proprate` varchar(3), 
+  `user21` varchar(250), 
+  `rcnfact` decimal(7,5), 
+  `obygrp` varchar(6), 
+  `ovrnbhd` varchar(8), 
+  `effageovr` decimal(4,0))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET

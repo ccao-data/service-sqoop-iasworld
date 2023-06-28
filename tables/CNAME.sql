@@ -128,6 +128,9 @@ CREATE TABLE `iasworld.cname`(
   `hidename` varchar(1), 
   `vldrsc` varchar(20), 
   `addrvalid` varchar(1), 
-  `skip_addr_validation` varchar(1))
+  `skip_addr_validation` varchar(1), 
+  `contactguid` varchar(36), 
+  `addressguid` varchar(36), 
+  `ssn2` varchar(9))
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

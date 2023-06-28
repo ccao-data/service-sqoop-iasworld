@@ -188,7 +188,9 @@ CREATE TABLE `iasworld.aprval`(
   `user40` varchar(80), 
   `overridemodelid` decimal(10,0), 
   `mkttotval` decimal(10,0), 
-  `ovrmraval` decimal(10,0),
+  `ovrmraval` decimal(10,0), 
+  `spssmraland` decimal(10,0), 
+  `spssmrabldg` decimal(10,0),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -382,7 +384,9 @@ CREATE TABLE `iasworld.aprval_bucketed`(
   `user40` varchar(80), 
   `overridemodelid` decimal(10,0), 
   `mkttotval` decimal(10,0), 
-  `ovrmraval` decimal(10,0))
+  `ovrmraval` decimal(10,0), 
+  `spssmraland` decimal(10,0), 
+  `spssmrabldg` decimal(10,0))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

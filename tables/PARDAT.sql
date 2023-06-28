@@ -218,7 +218,24 @@ CREATE TABLE `iasworld.pardat`(
   `userval8` decimal(10,0), 
   `userval9` decimal(10,0), 
   `userval10` decimal(10,0), 
-  `skip_addr_validation` varchar(1),
+  `skip_addr_validation` varchar(1), 
+  `udate1` string, 
+  `udate2` string, 
+  `udate3` string, 
+  `udate4` string, 
+  `udate5` string, 
+  `assessorid` decimal(10,0), 
+  `ovrassessorid` decimal(10,0), 
+  `user86` varchar(80), 
+  `user87` varchar(80), 
+  `user88` varchar(80), 
+  `user89` varchar(80), 
+  `user90` varchar(80), 
+  `userval11` decimal(10,0), 
+  `userval12` decimal(10,0), 
+  `userval13` decimal(10,0), 
+  `userval14` decimal(10,0), 
+  `userval15` decimal(10,0),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -442,7 +459,24 @@ CREATE TABLE `iasworld.pardat_bucketed`(
   `userval8` decimal(10,0), 
   `userval9` decimal(10,0), 
   `userval10` decimal(10,0), 
-  `skip_addr_validation` varchar(1))
+  `skip_addr_validation` varchar(1), 
+  `udate1` string, 
+  `udate2` string, 
+  `udate3` string, 
+  `udate4` string, 
+  `udate5` string, 
+  `assessorid` decimal(10,0), 
+  `ovrassessorid` decimal(10,0), 
+  `user86` varchar(80), 
+  `user87` varchar(80), 
+  `user88` varchar(80), 
+  `user89` varchar(80), 
+  `user90` varchar(80), 
+  `userval11` decimal(10,0), 
+  `userval12` decimal(10,0), 
+  `userval13` decimal(10,0), 
+  `userval14` decimal(10,0), 
+  `userval15` decimal(10,0))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

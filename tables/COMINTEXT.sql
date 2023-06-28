@@ -202,7 +202,14 @@ CREATE TABLE `iasworld.comintext`(
   `slabarea` decimal(10,0), 
   `structarea` decimal(10,0), 
   `cubicfeet` decimal(10,0), 
-  `ac_units` decimal(10,0))
+  `ac_units` decimal(10,0), 
+  `user21` varchar(250), 
+  `user22` varchar(250), 
+  `user23` varchar(250), 
+  `user24` varchar(250), 
+  `user25` varchar(250), 
+  `numident` decimal(2,0), 
+  `effageovr` decimal(4,0))
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

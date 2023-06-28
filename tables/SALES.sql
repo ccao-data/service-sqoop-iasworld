@@ -175,7 +175,17 @@ CREATE TABLE `iasworld.sales`(
   `userval17` decimal(10,0), 
   `userval18` decimal(10,0), 
   `userval19` decimal(10,0), 
-  `userval20` decimal(10,0))
+  `userval20` decimal(10,0), 
+  `note8` varchar(1000), 
+  `note9` varchar(1000), 
+  `note10` varchar(1000), 
+  `udate1` string, 
+  `udate2` string, 
+  `udate3` string, 
+  `udate4` string, 
+  `udate5` string, 
+  `deed_ref` varchar(1), 
+  `timeadjvaldt2` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.sales_bucketed`(
@@ -355,7 +365,17 @@ CREATE TABLE `iasworld.sales_bucketed`(
   `userval17` decimal(10,0), 
   `userval18` decimal(10,0), 
   `userval19` decimal(10,0), 
-  `userval20` decimal(10,0))
+  `userval20` decimal(10,0), 
+  `note8` varchar(1000), 
+  `note9` varchar(1000), 
+  `note10` varchar(1000), 
+  `udate1` string, 
+  `udate2` string, 
+  `udate3` string, 
+  `udate4` string, 
+  `udate5` string, 
+  `deed_ref` varchar(1), 
+  `timeadjvaldt2` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 30 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

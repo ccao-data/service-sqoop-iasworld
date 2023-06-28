@@ -15,7 +15,7 @@ CREATE TABLE `iasworld.comdat`(
   `units` decimal(4,0), 
   `structure` varchar(3), 
   `valmeth` varchar(1), 
-  `proprate` varchar(2), 
+  `proprate` varchar(3), 
   `grade` varchar(4), 
   `gfact` decimal(3,2), 
   `useradj` decimal(6,4), 
@@ -140,7 +140,10 @@ CREATE TABLE `iasworld.comdat`(
   `userval4` decimal(10,0), 
   `userval5` decimal(10,0), 
   `bld_modelid` varchar(80), 
-  `ovrmraval` decimal(10,0),
+  `ovrmraval` decimal(10,0), 
+  `rcnfact` decimal(7,5), 
+  `effageovr` decimal(4,0), 
+  `ovrnbhd` varchar(8),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -161,7 +164,7 @@ CREATE TABLE `iasworld.comdat_bucketed`(
   `units` decimal(4,0), 
   `structure` varchar(3), 
   `valmeth` varchar(1), 
-  `proprate` varchar(2), 
+  `proprate` varchar(3), 
   `grade` varchar(4), 
   `gfact` decimal(3,2), 
   `useradj` decimal(6,4), 
@@ -286,7 +289,10 @@ CREATE TABLE `iasworld.comdat_bucketed`(
   `userval4` decimal(10,0), 
   `userval5` decimal(10,0), 
   `bld_modelid` varchar(80), 
-  `ovrmraval` decimal(10,0))
+  `ovrmraval` decimal(10,0), 
+  `rcnfact` decimal(7,5), 
+  `effageovr` decimal(4,0), 
+  `ovrnbhd` varchar(8))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
