@@ -32,3 +32,4 @@ jobs:
           tags: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
