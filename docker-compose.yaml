@@ -4,7 +4,7 @@ x-default: &node
   build:
     context: .
     dockerfile: Dockerfile
-  image: ${CCAO_REGISTRY_URL}/services/service_sqoop_iasworld:latest
+  image: ${CCAO_REGISTRY_URL}/service-sqoop-iasworld:latest
   volumes:
     - ./drivers:/jdbc
     - ./scripts:/tmp/scripts
@@ -45,14 +45,14 @@ services:
       - ./docker-config/hive/:/docker-entrypoint-initdb.d/
     networks:
       - hadoopnet
-    depends_on: 
+    depends_on:
       - sqoop-node-master
 
   hive-metastore-server:
     <<: *node
     container_name: hive-metastore-server
     hostname: hive-metastore-server
-    depends_on: 
+    depends_on:
       - sqoop-node-master
     environment:
       - MASTER_HOSTNAME=sqoop-node-master
