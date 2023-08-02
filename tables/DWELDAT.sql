@@ -344,7 +344,16 @@ CREATE TABLE `iasworld.dweldat`(
   `comwallfact` decimal(5,3), 
   `ceiling` varchar(2), 
   `addfact` decimal(5,3), 
-  `fixtotovr` decimal(4,0),
+  `fixtotovr` decimal(4,0), 
+  `fixhalfm` decimal(2,0), 
+  `fixhalfu` decimal(2,0), 
+  `fixbathm` decimal(2,0), 
+  `fixbathu` decimal(2,0), 
+  `fixbath4m` decimal(2,0), 
+  `fixbath4u` decimal(2,0), 
+  `fixbath5m` decimal(2,0), 
+  `fixbath5u` decimal(2,0), 
+  `plumbgrade` varchar(4),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -694,7 +703,16 @@ CREATE TABLE `iasworld.dweldat_bucketed`(
   `comwallfact` decimal(5,3), 
   `ceiling` varchar(2), 
   `addfact` decimal(5,3), 
-  `fixtotovr` decimal(4,0))
+  `fixtotovr` decimal(4,0), 
+  `fixhalfm` decimal(2,0), 
+  `fixhalfu` decimal(2,0), 
+  `fixbathm` decimal(2,0), 
+  `fixbathu` decimal(2,0), 
+  `fixbath4m` decimal(2,0), 
+  `fixbath4u` decimal(2,0), 
+  `fixbath5m` decimal(2,0), 
+  `fixbath5u` decimal(2,0), 
+  `plumbgrade` varchar(4))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
