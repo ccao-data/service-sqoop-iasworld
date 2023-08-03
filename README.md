@@ -13,7 +13,7 @@ In this case, `sqoop` is used to export table dumps from iasWorld, the CCAO's sy
 - `logs/` - Location of temporary log files. Logs are manually uploaded to AWS CloudWatch after each run is complete
 - `scripts/` - Runtime scripts to run `sqoop` jobs within Docker
 - `secrets/` - Mounted during run to provide DB password via a file. Alter `secrets/IPTS_PASSWORD` to contain your password
-- `tables/` - Table definitions and metadata used to create Hive tables for `sqoop` to extract to. Manually stored since certain tables include paritioning and bucketing
+- `tables/` - Table definitions and metadata used to create Hive tables for `sqoop` to extract to. Manually stored since certain tables include partitioning and bucketing
 - `target/` - Mounted during run as output directory. All parquet files and job artifacts are saved temporarily before being uploaded to S3
 
 ### Important Files
@@ -37,7 +37,7 @@ You will need the following tools installed before using this repo:
 
 The rest of the dependencies for `sqoop` are installed using the included `Dockerfile`. To retrieve them, run either of the following commands within the repo directory:
 
-- `docker-compose pull` - Grabs the latest image from the CCAO GitLab registry, if it exists
+- `docker-compose pull` - Grabs the latest image from the CCAO GitHub registry, if it exists
 - `docker-compose build` - Builds the `sqoop` image from the included `Dockerfile`
 
 ### Update table schemas
@@ -47,7 +47,7 @@ If tables schemas are altered in iasWorld (column type change, new columns), the
 1. (Optional) If new tables have been added, they must be added to `tables/tables-list.csv`
 2. Change `/tmp/scripts/run-sqoop.sh` to `/tmp/scripts/get-tables.sh` in `docker-compose.yaml`
 3. Run `docker compose up` and wait for the schema files (`tables/$TABLE.sql`) to update
-4. Run `./update-tables.sh` to add bucketing and paritioning to the table schemas
+4. Run `./update-tables.sh` to add bucketing and partitioning to the table schemas
 5. Update the cron job in the README with any new tables, as well as the actual cronjob using `sudo crontab -e`
 
 ### Export Tables
@@ -69,10 +69,10 @@ Table extractions are schedule via [`cron`](https://man7.org/linux/man-pages/man
 
 ```bash
 # Extract recent years from frequently used tables on weekdays at 1 AM CST
-0 6 * * 1,2,3,4,5 cd /local/path/to/repo && YEAR="$(($(date '+\%Y') - 1))" IPTS_TABLE="ADDN>$YEAR APRVAL>$YEAR ASMT_HIST>$YEAR ASMT_ALL>$YEAR COMDAT>$YEAR CVLEG>$YEAR DWELDAT>$YEAR HTPAR>$YEAR LEGDAT>$YEAR OBY>$YEAR OWNDAT>$YEAR PARDAT>$YEAR SALES SPLCOM>$YEAR" /bin/bash ./run.sh
+0 6 * * 1,2,3,4,5 cd /local/path/to/repo && YEAR="$(($(date '+\%Y') - 1))" IPTS_TABLE="ADDN>$YEAR APRVAL>$YEAR ASMT_HIST>$YEAR ASMT_ALL>$YEAR COMDAT>$YEAR CVLEG>$YEAR DWELDAT>$YEAR ENTER HTPAR>$YEAR LEGDAT>$YEAR OBY>$YEAR OWNDAT>$YEAR PARDAT>$YEAR PERMIT SALES SPLCOM>$YEAR" /bin/bash ./run.sh
 
 # Extract all tables except for ASMT_ALL and ASMT_HIST on Saturday at 1 AM CST
-0 6 * * 6 cd /local/path/to/repo && IPTS_TABLE="AASYSJUR ADDN ADDRINDX APRVAL CNAME COMDAT COMFEAT COMINTEXT COMNT COMNT3 CVLEG CVOWN CVTRAN DEDIT DWELDAT EXADMN EXAPP EXCODE EXDET HTAGNT HTDATES HTPAR LAND LEGDAT LPMOD LPNBHD OBY OWNDAT PARDAT RCOBY SALES SPLCOM VALCLASS" /bin/bash ./run.sh
+0 6 * * 6 cd /local/path/to/repo && IPTS_TABLE="AASYSJUR ADDN ADDRINDX APRVAL CNAME COMDAT COMFEAT COMINTEXT COMNT COMNT3 CVLEG CVOWN CVTRAN DEDIT DWELDAT ENTER EXADMN EXAPP EXCODE EXDET HTAGNT HTDATES HTPAR LAND LEGDAT LPMOD LPNBHD OBY OWNDAT PARDAT RCOBY PERMIT SALES SPLCOM VALCLASS" /bin/bash ./run.sh
 ```
 
 ## Useful Resources
