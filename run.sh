@@ -1,5 +1,5 @@
 #!/bin/bash
-START_TIME=`date +%s`
+START_TIME=$(date +%s)
 
 # Env variables controlling where sqooped data is exported to
 TEMP_LOG_FILE="logs/temp-sqoop-log"
@@ -24,7 +24,7 @@ find target/ -maxdepth 1 -type d -empty -delete
 TABLES_EXTRACTED=$(ls target/)
 for TABLE in ${TABLES_EXTRACTED}; do
     SUB_DIRS=$(find target/${TABLE}/* -maxdepth 1 -type d -exec basename {} \;)
-    if [[ ! -z $SUB_DIRS && $(echo ${SUB_DIRS} | wc -l ) -gt 0 ]]; then
+    if [[ -n ${SUB_DIRS} && $(echo ${SUB_DIRS} | wc -l ) -gt 0 ]]; then
         for dir in ${SUB_DIRS}; do
             /usr/bin/aws s3 rm \
                 ${BUCKET_URI}/iasworld/${TABLE}/${dir} \
@@ -60,7 +60,7 @@ done
 find target/ -type d -empty -delete
 
 # Print overall runtime stats and tables extracted
-END_TIME=`date +%s`
+END_TIME=$(date +%s)
 RUNTIME=$((END_TIME-START_TIME))
 HH=$((RUNTIME / 3600))
 MM=$(( (RUNTIME % 3600) / 60 ))
@@ -122,5 +122,5 @@ done
 echo "Logs successfully uploaded to CloudWatch"
 
 # Remove uploaded log files
-mv ${TEMP_LOG_FILE} ${BACKUP_LOG_FILE}
-rm ${TEMP_LOG_FILE}*
+mv ./${TEMP_LOG_FILE} ./${BACKUP_LOG_FILE}
+if [[ -n ${TEMP_LOG_FILE} ]]; then rm ./${TEMP_LOG_FILE}*; fi
