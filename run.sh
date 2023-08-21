@@ -5,7 +5,7 @@ START_TIME=`date +%s`
 TEMP_LOG_FILE="logs/temp-sqoop-log"
 BACKUP_LOG_FILE="logs/backup-sqoop-log"
 BUCKET_URI="s3://ccao-data-warehouse-us-east-1"
-BUCKET_URI="ccao-data-warehouse-iasworld-crawler"
+CRAWLER_NAME="ccao-data-warehouse-iasworld-crawler"
 LOG_GROUP_NAME="/ccao/jobs/sqoop"
 
 # Run all sqoop jobs to extract tables
