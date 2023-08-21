@@ -66,13 +66,13 @@ find target/ -type d -empty -delete
 /usr/bin/aws glue \
     start-crawler --name "$CRAWLER_NAME" \
     | ts '%.s' \
-    | tee -a ${TEMP_LOG_FILE}
+    | tee -a "$TEMP_LOG_FILE"
 
 # Trigger a workflow to run all dbt tests now that new data is uploaded, but
 # don't let this step crash the log upload
 source scripts/dispatch-dbt-workflow.sh || true \
     | ts '%.s' \
-    | tee -a ${TEMP_LOG_FILE}
+    | tee -a "$TEMP_LOG_FILE"
 
 # Print overall runtime stats and tables extracted
 END_TIME=`date +%s`
