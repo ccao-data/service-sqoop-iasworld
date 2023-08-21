@@ -4,6 +4,7 @@
 
 # Fresh base image 
 FROM centos:7 AS hadoop
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 # Development tools
 RUN yum install -y curl which tar bunzip2 openssh-server openssh-clients rsync && \
@@ -12,9 +13,10 @@ RUN yum install -y curl which tar bunzip2 openssh-server openssh-clients rsync &
 
 # JDK8
 ARG JAVA_VER=1.8.0
-ENV JAVA_HOME /usr/lib/jvm/java-${JAVA_VER}-openjdk
-ENV PATH ${PATH}:${JAVA_HOME}/bin
-RUN yum install -y java-${JAVA_VER}-openjdk-devel
+ENV JAVA_HOME /usr/lib/jvm/java-"$JAVA_VER"-openjdk
+ENV PATH "$PATH":"$JAVA_HOME"/bin
+RUN yum install -y java-"$JAVA_VER"-openjdk-devel && \
+    yum clean all
 
 # Hadoop 
 ARG HADOOP_VER=3.1.0
@@ -24,32 +26,32 @@ ENV HDFS_DATANODE_USER root
 ENV HDFS_SECONDARYNAMENODE_USER root
 ENV YARN_RESOURCEMANAGER_USER root
 ENV YARN_NODEMANAGER_USER root
-ENV HADOOP_COMMON_HOME ${HADOOP_HOME}
-ENV HADOOP_HDFS_HOME ${HADOOP_HOME}
-ENV HADOOP_MAPRED_HOME ${HADOOP_HOME}
-ENV HADOOP_YARN_HOME ${HADOOP_HOME}
-ENV HADOOP_CONF_DIR ${HADOOP_HOME}/etc/hadoop
-ENV PATH ${PATH}:${HADOOP_HOME}/bin
-RUN curl -sk https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VER}/hadoop-${HADOOP_VER}.tar.gz \
+ENV HADOOP_COMMON_HOME "$HADOOP_HOME"
+ENV HADOOP_HDFS_HOME "$HADOOP_HOME"
+ENV HADOOP_MAPRED_HOME "$HADOOP_HOME"
+ENV HADOOP_YARN_HOME "$HADOOP_HOME"
+ENV HADOOP_CONF_DIR "$HADOOP_HOME"/etc/hadoop
+ENV PATH "$PATH":"$HADOOP_HOME"/bin
+RUN curl -sk https://archive.apache.org/dist/hadoop/common/hadoop-"$HADOOP_VER"/hadoop-"$HADOOP_VER".tar.gz \
     | tar -xz -C /usr/local/ && \
     cd /usr/local && \
-    ln -s ./hadoop-${HADOOP_VER} hadoop && \
-    echo "JAVA_HOME=${JAVA_HOME}" >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
-    echo "HADOOP_HOME=${HADOOP_HOME}" >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
+    ln -s ./hadoop-"$HADOOP_VER" hadoop && \
+    echo "JAVA_HOME=${JAVA_HOME}" >> "$HADOOP_HOME"/etc/hadoop/hadoop-env.sh && \
+    echo "HADOOP_HOME=${HADOOP_HOME}" >> "$HADOOP_HOME"/etc/hadoop/hadoop-env.sh
 
 # Copy config files. Initially run in pseudo-distributed mode
 # for namenode setup/formatting
-RUN mkdir ${HADOOP_HOME}/input && \
-    cp ${HADOOP_HOME}/etc/hadoop/*.xml ${HADOOP_HOME}/input
-COPY docker-config/site/ ${HADOOP_HOME}/etc/hadoop/
+RUN mkdir "$HADOOP_HOME"/input && \
+    cp "$HADOOP_HOME"/etc/hadoop/*.xml "$HADOOP_HOME"/input
+COPY docker-config/site/ "$HADOOP_HOME"/etc/hadoop/
 RUN sed s/HOSTNAME/localhost/ \
-    ${HADOOP_HOME}/etc/hadoop/core-site.xml.template \
-    > ${HADOOP_HOME}/etc/hadoop/core-site.xml && \
+    "$HADOOP_HOME"/etc/hadoop/core-site.xml.template \
+    > "$HADOOP_HOME"/etc/hadoop/core-site.xml && \
     sed s/HOSTNAME/localhost/ \
-    ${HADOOP_HOME}/etc/hadoop/yarn-site.xml.template \
+    "$HADOOP_HOME"/etc/hadoop/yarn-site.xml.template \
     > /usr/local/hadoop/etc/hadoop/yarn-site.xml && \
     sed s/HOSTNAME/localhost/ \
-    ${HADOOP_HOME}/etc/hadoop/mapred-site.xml.template \
+    "$HADOOP_HOME"/etc/hadoop/mapred-site.xml.template \
     > /usr/local/hadoop/etc/hadoop/mapred-site.xml
 
 # ssh setup for node comms
@@ -84,38 +86,38 @@ FROM hadoop AS sqoop
 ARG SQOOP_VER=1.4.7
 ARG SQOOP_HADOOP_VER=2.6.0
 ENV SQOOP_HOME /usr/local/sqoop
-ENV SQOOP_CONF_DIR ${SQOOP_HOME}/conf
-ENV PATH ${PATH}:${HADOOP_HOME}/bin:${SQOOP_HOME}/bin
-RUN curl -s http://archive.apache.org/dist/sqoop/${SQOOP_VER}/sqoop-${SQOOP_VER}.bin__hadoop-${SQOOP_HADOOP_VER}.tar.gz \
+ENV SQOOP_CONF_DIR "$SQOOP_HOME"/conf
+ENV PATH "$PATH":"$HADOOP_HOME"/bin:"$SQOOP_HOME"/bin
+RUN curl -s http://archive.apache.org/dist/sqoop/"$SQOOP_VER"/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER".tar.gz \
     | tar -xz -C /usr/local && \
-    ln -s /usr/local/sqoop-${SQOOP_VER}.bin__hadoop-${SQOOP_HADOOP_VER} ${SQOOP_HOME}
+    ln -s /usr/local/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER" "$SQOOP_HOME"
 
 # Make dirs for class files and jars
 RUN mkdir -p /tmp/bindir /tmp/target && \
-    chmod +x ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh && \
-    chown root:root ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
+    chmod +x "$HADOOP_HOME"/etc/hadoop/hadoop-env.sh && \
+    chown root:root "$HADOOP_HOME"/etc/hadoop/hadoop-env.sh
 
 # Download and install Apache Hive
 ARG HIVE_VER=3.1.2
-ENV HIVE_HOME /usr/local/hive/apache-hive-${HIVE_VER}-bin
-ENV HIVE_CONF_DIR ${HIVE_HOME}/conf
-ENV HCAT_HOME ${HIVE_HOME}/hcatalog
-ENV PATH ${PATH}:${HIVE_HOME}/bin
-ENV PATH ${PATH}:${HCAT_HOME}/bin
+ENV HIVE_HOME /usr/local/hive/apache-hive-"$HIVE_VER"-bin
+ENV HIVE_CONF_DIR "$HIVE_HOME"/conf
+ENV HCAT_HOME "$HIVE_HOME"/hcatalog
+ENV PATH "$PATH":"$HIVE_HOME"/bin
+ENV PATH "$PATH":"$HCAT_HOME"/bin
 RUN mkdir -p /usr/local/hive && \
-    curl -s https://dlcdn.apache.org/hive/hive-${HIVE_VER}/apache-hive-${HIVE_VER}-bin.tar.gz \
+    curl -s https://dlcdn.apache.org/hive/hive-"$HIVE_VER"/apache-hive-"$HIVE_VER"-bin.tar.gz \
     | tar -xz -C /usr/local/hive && \
-    rm ${HIVE_HOME}/lib/log4j-slf4j-impl-2.10.0.jar
-COPY docker-config/hive/hive-site.xml ${HIVE_CONF_DIR}
+    rm "$HIVE_HOME"/lib/log4j-slf4j-impl-2.10.0.jar
+COPY docker-config/hive/hive-site.xml "$HIVE_CONF_DIR"
 
 # Install the postgresql connector driver
 ARG PSQL_JDBC_VER=42.2.24
-RUN curl -o /usr/share/java/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-${PSQL_JDBC_VER}.jar && \
+RUN curl -o /usr/share/java/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-"$PSQL_JDBC_VER".jar && \
     chmod 644 /usr/share/java/postgresql-jdbc.jar && \
-    ln -s /usr/share/java/postgresql-jdbc.jar ${HIVE_HOME}/lib/postgresql-jdbc.jar
+    ln -s /usr/share/java/postgresql-jdbc.jar "$HIVE_HOME"/lib/postgresql-jdbc.jar
 
 # Entrypoint/startup for sqoop and hive
-ADD https://repo1.maven.org/maven2/org/json/json/20090211/json-20090211.jar ${SQOOP_HOME}/lib
+ADD https://repo1.maven.org/maven2/org/json/json/20090211/json-20090211.jar "$SQOOP_HOME"/lib
 COPY docker-config/bootstrap.sh docker-config/entrypoint.sh /etc/docker-config/
 RUN chown -R root:root /etc/docker-config/ && \
     chmod -R 755 /etc/docker-config/ && \
