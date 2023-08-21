@@ -5,6 +5,7 @@ START_TIME=`date +%s`
 TEMP_LOG_FILE="logs/temp-sqoop-log"
 BACKUP_LOG_FILE="logs/backup-sqoop-log"
 BUCKET_URI="s3://ccao-data-warehouse-us-east-1"
+BUCKET_URI="ccao-data-warehouse-iasworld-crawler"
 LOG_GROUP_NAME="/ccao/jobs/sqoop"
 
 # Run all sqoop jobs to extract tables
@@ -58,6 +59,13 @@ done
 
 # Delete any remaining empty dirs
 find target/ -type d -empty -delete
+
+# Kick off Glue crawler run. Not strictly necessary since 99%
+# of the time we're not creating new partitions or columns
+/usr/bin/aws glue \
+    start-crawler --name "$CRAWLER_NAME" \
+    | ts '%.s' \
+    | tee -a ${TEMP_LOG_FILE}
 
 # Print overall runtime stats and tables extracted
 END_TIME=`date +%s`
