@@ -1,0 +1,34 @@
+#!/bin/bash
+
+GH_API_REPO="https://api.github.com/repos/ccao-data/data-architecture"
+GH_DBT_WORKFLOW="test_dbt_models.yaml"
+
+# First auth as a GitHub app using JSON Web Token (JWT).
+# Uses a local PEM file and python lib to construct the JWT
+GH_JWT=$(python3 scripts/get-jwt.py)
+
+# Grab the token URL from our current installation
+GH_TOKENS_URL=$(curl -s --request GET \
+    --url "https://api.github.com/app/installations" \
+    --header "Accept: application/vnd.github+json" \
+    --header "Authorization: Bearer ${GH_JWT}" \
+    --header "X-GitHub-Api-Version: 2022-11-28" \
+    | jq -r '.[].access_tokens_url')
+
+# Auth against the tokens URL to get a short-lived (60 second) token
+GH_TOKEN=$(curl -s -L \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GH_JWT}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "$GH_TOKENS_URL" \
+    | jq -r '.token')
+
+# Use the token to call the API and dispatch the workflow
+curl -L \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GH_TOKEN}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "$GH_API_REPO"/actions/workflows/"$GH_DBT_WORKFLOW"/dispatches \
+    -d '{"ref": "master"}'
