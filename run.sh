@@ -13,7 +13,7 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
     --remove-orphans \
     --no-color \
     | ts '%.s' \
-    | tee ${TEMP_LOG_FILE}
+    | tee "$TEMP_LOG_FILE"
 
 # Cleanup after docker run
 /usr/local/bin/docker-compose rm -f -s -v
@@ -23,98 +23,97 @@ LOG_GROUP_NAME="/ccao/jobs/sqoop"
 find target/ -maxdepth 1 -type d -empty -delete
 TABLES_EXTRACTED=$(ls target/)
 for TABLE in ${TABLES_EXTRACTED}; do
-    SUB_DIRS=$(find target/${TABLE}/* -maxdepth 1 -type d -exec basename {} \;)
-    if [[ -n ${SUB_DIRS} && $(echo ${SUB_DIRS} | wc -l ) -gt 0 ]]; then
+    SUB_DIRS=$(find target/"$TABLE"/* -maxdepth 1 -type d -exec basename {} \;)
+    if [[ -n "$SUB_DIRS" && $(echo "$SUB_DIRS" | wc -l) -gt 0 ]]; then
         for dir in ${SUB_DIRS}; do
             /usr/bin/aws s3 rm \
-                ${BUCKET_URI}/iasworld/${TABLE}/${dir} \
+                "$BUCKET_URI"/iasworld/"$TABLE"/"$dir" \
                 --exclude "*" \
                 --include "*.parquet" \
                 --recursive \
                 | ts '%.s' \
-                | tee -a ${TEMP_LOG_FILE}
+                | tee -a "$TEMP_LOG_FILE"
         done
     else
         /usr/bin/aws s3 rm \
-            ${BUCKET_URI}/iasworld/${TABLE} \
+            "$BUCKET_URI"/iasworld/"$TABLE" \
             --exclude "*" \
             --include "*.parquet" \
             --recursive \
             | ts '%.s' \
-            | tee -a ${TEMP_LOG_FILE}
+            | tee -a "$TEMP_LOG_FILE"
     fi
 done
 
 # Uploaded pulled files from local target/ dir to S3
 /usr/bin/aws s3 mv \
     target/ \
-    ${BUCKET_URI}/iasworld \
+    "$BUCKET_URI"/iasworld \
     --exclude "*" \
     --include "*.parquet" \
     --recursive \
     --no-progress \
     | ts '%.s' \
-    | tee -a ${TEMP_LOG_FILE}
+    | tee -a "$TEMP_LOG_FILE"
 
 # Delete any remaining empty dirs
 find target/ -type d -empty -delete
 
 # Print overall runtime stats and tables extracted
 END_TIME=$(date +%s)
-RUNTIME=$((END_TIME-START_TIME))
+RUNTIME=$((END_TIME - START_TIME))
 HH=$((RUNTIME / 3600))
-MM=$(( (RUNTIME % 3600) / 60 ))
-SS=$(( (RUNTIME % 3600) % 60 ))
+MM=$(((RUNTIME % 3600) / 60))
+SS=$(((RUNTIME % 3600) % 60))
 echo "Tables extracted: ${TABLES_EXTRACTED}" \
     | ts '%.s' \
-    | tee -a ${TEMP_LOG_FILE}
+    | tee -a "$TEMP_LOG_FILE"
 echo "Total extraction time: ${HH}:${MM}:${SS} (hh:mm:ss)" \
     | ts '%.s' \
-    | tee -a ${TEMP_LOG_FILE}
+    | tee -a "$TEMP_LOG_FILE"
 
 # Bash function to convert text log to JSON consumable by CloudWatch
-parse_logs () {
-    cat $1 \
-    | sed 's/ /|/' \
-    | sed 's/\([0-9]\.[0-9]\{3\}\)[0-9]\{1,\}/\1/' \
-    | sed 's/\.//' \
-    | awk '{print $1, $NF}' OFS='|' FS='|' \
-    | jq -Rn '[inputs
+parse_logs() {
+    sed 's/ /|/' "$1" \
+        | sed 's/\([0-9]\.[0-9]\{3\}\)[0-9]\{1,\}/\1/' \
+        | sed 's/\.//' \
+        | awk '{print $1, $NF}' OFS='|' FS='|' \
+        | jq -Rn '[inputs
         | . / "\n"
         | (.[] | select(length > 0) | . / "|") as $input
         | {"timestamp": $input[0]|tonumber, "message": $input[1]}]' \
-    > $2
+            > "$2"
 }
 
 # Create log stream in CloudWatch with today's date
 LOG_STREAM_NAME="sqoop-job-log-$(date -u +'%Y-%m-%d_%H-%M-%S')"
 /usr/bin/aws logs create-log-stream \
-    --log-group-name ${LOG_GROUP_NAME} \
-    --log-stream-name ${LOG_STREAM_NAME}
+    --log-group-name "$LOG_GROUP_NAME" \
+    --log-stream-name "$LOG_STREAM_NAME"
 
 # Convert text output from Docker and AWS CLI to clean JSON
 # for upload to AWS CloudWatch. Logs need to be split into chunks for upload
 # First loop skips using sequence token necessary for subsequent uploads
 COUNTER=1
-split -l 4000 ${TEMP_LOG_FILE} logs/temp-sqoop-log-
+split -l 4000 "$TEMP_LOG_FILE" logs/temp-sqoop-log-
 for f in logs/temp-sqoop-log-*; do
-    parse_logs ${f} ${f}.json
-    if [[ ${COUNTER} -eq 1 ]]; then
+    parse_logs "$f" "$f".json
+    if [[ "$COUNTER" -eq 1 ]]; then
         SEQ_TOKEN=$(
             /usr/bin/aws logs put-log-events \
-                --log-group-name ${LOG_GROUP_NAME} \
-                --log-stream-name ${LOG_STREAM_NAME} \
-                --log-events file://${f}.json \
-            | jq -r .nextSequenceToken
+                --log-group-name "$LOG_GROUP_NAME" \
+                --log-stream-name "$LOG_STREAM_NAME" \
+                --log-events file://"$f".json \
+                | jq -r .nextSequenceToken
         )
     else
         SEQ_TOKEN=$(
             /usr/bin/aws logs put-log-events \
-                --log-group-name ${LOG_GROUP_NAME} \
-                --log-stream-name ${LOG_STREAM_NAME} \
-                --log-events file://${f}.json \
-                --sequence-token ${SEQ_TOKEN} \
-            | jq -r .nextSequenceToken
+                --log-group-name "$LOG_GROUP_NAME" \
+                --log-stream-name "$LOG_STREAM_NAME" \
+                --log-events file://"$f".json \
+                --sequence-token "$SEQ_TOKEN" \
+                | jq -r .nextSequenceToken
         )
     fi
     COUNTER=$((COUNTER + 1))
@@ -122,5 +121,5 @@ done
 echo "Logs successfully uploaded to CloudWatch"
 
 # Remove uploaded log files
-mv ./${TEMP_LOG_FILE} ./${BACKUP_LOG_FILE}
-if [[ -n ${TEMP_LOG_FILE} ]]; then rm ./${TEMP_LOG_FILE}*; fi
+mv ./"$TEMP_LOG_FILE" ./"$BACKUP_LOG_FILE"
+if [[ -n "$TEMP_LOG_FILE" ]]; then rm ./"$TEMP_LOG_FILE"*; fi
