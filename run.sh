@@ -63,10 +63,8 @@ find target/ -type d -empty -delete
 # Kick off Glue crawler run. Not strictly necessary since 99%
 # of the time we're not creating new partitions or columns,
 # but still nice to run
-/usr/bin/aws glue \
-    start-crawler --name "$CRAWLER_NAME" \
-    | ts '%.s' \
-    | tee -a "$TEMP_LOG_FILE"
+echo "Starting AWS Glue crawler run" | ts '%.s' | tee -a "$TEMP_LOG_FILE"
+/usr/bin/aws glue start-crawler --name "$CRAWLER_NAME" || true
 
 # Trigger a workflow to run all dbt tests now that new data is uploaded, but
 # don't let this step crash the log upload
