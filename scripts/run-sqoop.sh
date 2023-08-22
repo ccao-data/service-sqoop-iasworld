@@ -47,9 +47,9 @@ for TABLE in ${JOB_TABLES}; do
     else
         # Make number of mappers roughly equal to number of tax years
         if [[ "$QUERY_COND" == \> ]]; then
-            NUM_MAPPERS=$(($(date +%Y) - "$QUERY_YEAR"))
+            NUM_MAPPERS=$(($(date +%Y) - QUERY_YEAR))
         elif [[ ${QUERY_COND} == \< ]]; then
-            NUM_MAPPERS=$(("$QUERY_YEAR" - 1998))
+            NUM_MAPPERS=$((QUERY_YEAR - 1998))
         else
             NUM_MAPPERS=1
         fi

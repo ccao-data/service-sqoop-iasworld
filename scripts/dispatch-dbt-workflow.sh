@@ -10,11 +10,12 @@ GH_JWT=$(python3 scripts/get-jwt.py)
 
 # Grab the token URL from our current installation
 echo "Fetching GitHub tokens URL"
-GH_TOKENS_URL=$(curl -s --request GET \
-    --url "https://api.github.com/app/installations" \
-    --header "Accept: application/vnd.github+json" \
-    --header "Authorization: Bearer ${GH_JWT}" \
-    --header "X-GitHub-Api-Version: 2022-11-28" \
+GH_TOKENS_URL=$(curl -s -L \
+    -X GET \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GH_JWT}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    https://api.github.com/app/installations \
     | jq -r '.[].access_tokens_url')
 
 # Auth against the tokens URL to get a short-lived (60 second) token
@@ -29,7 +30,7 @@ GH_TOKEN=$(curl -s -L \
 
 # Use the token to call the API and dispatch the workflow
 echo "Dispatching workflow"
-curl -v -L \
+curl -s -L \
     -X POST \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GH_TOKEN}" \
