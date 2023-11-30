@@ -43,14 +43,11 @@ echo "Dispatching workflows"
 for i in ${!GH_API_REPOS[*]}; do
     GH_API_PARAMS=$(
         if [ -z "${GH_API_WORKFLOW_INPUTS[$i]}" ]; then
-            echo ""
+            echo '{"ref": "master"}'
         else
-            echo ", \"inputs\": { \"models\": \"${GH_API_WORKFLOW_INPUTS[$i]}\" }"
+            echo "{\"ref\": \"master\", \"inputs\": {\"models\": \"${GH_API_WORKFLOW_INPUTS[$i]}\"}"
         fi
     )
-
-    echo $GH_API_PARAMS
-    echo "{\"ref\": \"master\"${GH_API_PARAMS}}"
 
     curl -s -L \
         -X POST \
@@ -58,5 +55,5 @@ for i in ${!GH_API_REPOS[*]}; do
         -H "Authorization: Bearer ${GH_TOKEN}" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
         "${GH_API_REPOS[$i]}"/actions/workflows/"${GH_API_WORKFLOWS[$i]}"/dispatches \
-        -d "{\"ref\": \"master\"${GH_API_PARAMS}}"
+        -d "${GH_API_PARAMS}"
 done
