@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# These arrays are essentially "rows" of data, where each index (starting
+# with 0) represents a set of values this script will iterate through i.e.
+# For index 1, run build_and_test_dbt.yaml with model.vw_card_res_input and
+# model.vw_pin_condo_input as inputs to the workflow
 GH_API_REPOS=(
     "https://api.github.com/repos/ccao-data/data-architecture"
     "https://api.github.com/repos/ccao-data/data-architecture"
@@ -45,7 +49,7 @@ for i in ${!GH_API_REPOS[*]}; do
         if [ -z "${GH_API_WORKFLOW_INPUTS[$i]}" ]; then
             echo '{"ref": "master"}'
         else
-            echo "{\"ref\": \"master\", \"inputs\": {\"models\": \"${GH_API_WORKFLOW_INPUTS[$i]}\"}"
+            echo "{\"ref\": \"master\", \"inputs\": {\"models\": \"${GH_API_WORKFLOW_INPUTS[$i]}\"}}"
         fi
     )
 
