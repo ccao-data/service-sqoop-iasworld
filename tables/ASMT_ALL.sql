@@ -318,7 +318,8 @@ CREATE TABLE `iasworld.asmt_all`(
   `ovrcod60` varchar(3), 
   `ovrval60` decimal(10,0), 
   `val60` decimal(10,0), 
-  `splitno` decimal(15,0),
+  `splitno` decimal(15,0), 
+  `form` varchar(12),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -642,7 +643,8 @@ CREATE TABLE `iasworld.asmt_all_bucketed`(
   `ovrcod60` varchar(3), 
   `ovrval60` decimal(10,0), 
   `val60` decimal(10,0), 
-  `splitno` decimal(15,0))
+  `splitno` decimal(15,0), 
+  `form` varchar(12))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 30 BUCKETS
 STORED AS PARQUET

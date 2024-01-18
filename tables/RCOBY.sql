@@ -58,6 +58,21 @@ CREATE TABLE `iasworld.rcoby`(
   `wallhgt` decimal(3,0), 
   `msclass` varchar(2), 
   `mult_units` varchar(1), 
-  `dimref` varchar(3))
+  `dimref` varchar(3), 
+  `mvpinputfld1` varchar(12), 
+  `mvpinputfld2` varchar(12), 
+  `mvpinputfld3` varchar(12), 
+  `mvpinputfld4` varchar(12), 
+  `mvpinputfld5` varchar(12), 
+  `mvpinputdesc1` varchar(40), 
+  `mvpinputdesc2` varchar(40), 
+  `mvpinputdesc3` varchar(40), 
+  `mvpinputdesc4` varchar(40), 
+  `mvpinputdesc5` varchar(40), 
+  `mvpinputminmax1` varchar(40), 
+  `mvpinputminmax2` varchar(40), 
+  `mvpinputminmax3` varchar(40), 
+  `mvpinputminmax4` varchar(40), 
+  `mvpinputminmax5` varchar(40))
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

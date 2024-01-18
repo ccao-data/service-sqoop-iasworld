@@ -129,7 +129,12 @@ CREATE TABLE `iasworld.oby`(
   `rcnfact` decimal(7,5), 
   `obygrp` varchar(6), 
   `ovrnbhd` varchar(8), 
-  `effageovr` decimal(4,0),
+  `effageovr` decimal(4,0), 
+  `external_rcnld` decimal(10,0), 
+  `external_occpct` decimal(5,2), 
+  `external_propct` decimal(9,6), 
+  `external_calc_rcnld` decimal(10,0), 
+  `calc_meth` varchar(1),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -264,7 +269,12 @@ CREATE TABLE `iasworld.oby_bucketed`(
   `rcnfact` decimal(7,5), 
   `obygrp` varchar(6), 
   `ovrnbhd` varchar(8), 
-  `effageovr` decimal(4,0))
+  `effageovr` decimal(4,0), 
+  `external_rcnld` decimal(10,0), 
+  `external_occpct` decimal(5,2), 
+  `external_propct` decimal(9,6), 
+  `external_calc_rcnld` decimal(10,0), 
+  `calc_meth` varchar(1))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
