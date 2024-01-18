@@ -131,6 +131,8 @@ CREATE TABLE `iasworld.cname`(
   `skip_addr_validation` varchar(1), 
   `contactguid` varchar(36), 
   `addressguid` varchar(36), 
-  `ssn2` varchar(9))
+  `ssn2` varchar(9), 
+  `cell_phone` varchar(25), 
+  `business_phone` varchar(25))
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

@@ -10,10 +10,10 @@ CREATE TABLE `iasworld.addn`(
   `whocalc` varchar(10), 
   `wencalc` string, 
   `status` varchar(1), 
-  `lower` varchar(3), 
-  `first` varchar(3), 
-  `second` varchar(3), 
-  `third` varchar(3), 
+  `lower` varchar(5), 
+  `first` varchar(5), 
+  `second` varchar(5), 
+  `third` varchar(5), 
   `area` decimal(9,0), 
   `vect` varchar(500), 
   `value` decimal(10,0), 
@@ -78,7 +78,9 @@ CREATE TABLE `iasworld.addn`(
   `userval5` decimal(10,0), 
   `area_sqm` decimal(11,3), 
   `eff_area` decimal(10,0), 
-  `effageovr` decimal(4,0),
+  `effageovr` decimal(4,0), 
+  `stories` decimal(10,0), 
+  `footprint` decimal(10,0),
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -94,10 +96,10 @@ CREATE TABLE `iasworld.addn_bucketed`(
   `whocalc` varchar(10), 
   `wencalc` string, 
   `status` varchar(1), 
-  `lower` varchar(3), 
-  `first` varchar(3), 
-  `second` varchar(3), 
-  `third` varchar(3), 
+  `lower` varchar(5), 
+  `first` varchar(5), 
+  `second` varchar(5), 
+  `third` varchar(5), 
   `area` decimal(9,0), 
   `vect` varchar(500), 
   `value` decimal(10,0), 
@@ -162,7 +164,9 @@ CREATE TABLE `iasworld.addn_bucketed`(
   `userval5` decimal(10,0), 
   `area_sqm` decimal(11,3), 
   `eff_area` decimal(10,0), 
-  `effageovr` decimal(4,0))
+  `effageovr` decimal(4,0), 
+  `stories` decimal(10,0), 
+  `footprint` decimal(10,0))
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET

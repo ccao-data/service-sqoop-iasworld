@@ -209,7 +209,8 @@ CREATE TABLE `iasworld.comintext`(
   `user24` varchar(250), 
   `user25` varchar(250), 
   `numident` decimal(2,0), 
-  `effageovr` decimal(4,0))
+  `effageovr` decimal(4,0), 
+  `upperflarea` decimal(9,0))
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

@@ -143,7 +143,13 @@ CREATE TABLE `iasworld.comdat`(
   `ovrmraval` decimal(10,0), 
   `rcnfact` decimal(7,5), 
   `effageovr` decimal(4,0), 
-  `ovrnbhd` varchar(8),
+  `ovrnbhd` varchar(8), 
+  `external_rcnld` decimal(10,0), 
+  `external_occpct` decimal(5,2), 
+  `external_propct` decimal(9,6), 
+  `external_calc_rcnld` decimal(10,0), 
+  `calc_meth` varchar(1), 
+  `note3` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -292,7 +298,13 @@ CREATE TABLE `iasworld.comdat_bucketed`(
   `ovrmraval` decimal(10,0), 
   `rcnfact` decimal(7,5), 
   `effageovr` decimal(4,0), 
-  `ovrnbhd` varchar(8))
+  `ovrnbhd` varchar(8), 
+  `external_rcnld` decimal(10,0), 
+  `external_occpct` decimal(5,2), 
+  `external_propct` decimal(9,6), 
+  `external_calc_rcnld` decimal(10,0), 
+  `calc_meth` varchar(1), 
+  `note3` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET

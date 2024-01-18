@@ -115,7 +115,11 @@ CREATE TABLE `iasworld.splcom`(
   `newbldgpct` decimal(10,0), 
   `seq` decimal(3,0), 
   `splcom_status` varchar(1), 
-  `alt_splitnum` decimal(15,0))
+  `alt_splitnum` decimal(15,0), 
+  `user21` varchar(250), 
+  `user22` varchar(250), 
+  `user23` varchar(250), 
+  `user24` varchar(250))
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');
