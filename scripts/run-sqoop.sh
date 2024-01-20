@@ -1,4 +1,5 @@
 #!/bin/bash
+MAX_MAPPERS=16
 
 # Check if table env var exists from docker, if not, use all tables
 if [[ -z "$IPTS_TABLE" ]]; then
@@ -41,6 +42,7 @@ for TABLE in ${JOB_TABLES}; do
     QUERY_COND=$(echo "$IPTS_TABLE" | grep -Po "(?<=${TABLE})[<>=]")
     if [[ -z "$QUERY_YEAR" && -z "$QUERY_COND" ]]; then
         NUM_MAPPERS=$(($(date +%Y) - 1998))
+        NUM_MAPPERS=$((NUM_MAPPERS < MAX_MAPPERS ? NUM_MAPPERS : MAX_MAPPERS))
         BOUNDARY_QUERY="SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}"
         QUERY="SELECT * FROM IASWORLD.${TABLE}
                WHERE \$CONDITIONS"
@@ -53,6 +55,7 @@ for TABLE in ${JOB_TABLES}; do
         else
             NUM_MAPPERS=1
         fi
+        NUM_MAPPERS=$((NUM_MAPPERS < MAX_MAPPERS ? NUM_MAPPERS : MAX_MAPPERS))
         BOUNDARY_QUERY="SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}
                         WHERE TAXYR ${QUERY_COND} ${QUERY_YEAR}"
         QUERY="SELECT * FROM IASWORLD.${TABLE}
