@@ -148,7 +148,8 @@ CREATE TABLE `iasworld.legdat`(
   `user60` varchar(80), 
   `schdist2` varchar(5), 
   `schvalpct2` decimal(9,6), 
-  `form` varchar(12),
+  `form` varchar(12), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -302,7 +303,8 @@ CREATE TABLE `iasworld.legdat_bucketed`(
   `user60` varchar(80), 
   `schdist2` varchar(5), 
   `schvalpct2` decimal(9,6), 
-  `form` varchar(12))
+  `form` varchar(12), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

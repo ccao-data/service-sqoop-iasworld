@@ -73,6 +73,7 @@ CREATE TABLE `iasworld.rcoby`(
   `mvpinputminmax2` varchar(40), 
   `mvpinputminmax3` varchar(40), 
   `mvpinputminmax4` varchar(40), 
-  `mvpinputminmax5` varchar(40))
+  `mvpinputminmax5` varchar(40), 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

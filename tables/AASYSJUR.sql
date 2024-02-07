@@ -38,6 +38,7 @@ CREATE TABLE `iasworld.aasysjur`(
   `aprvalsum_ind` varchar(1), 
   `iasw_id` decimal(10,0), 
   `who` varchar(50), 
-  `wen` string)
+  `wen` string, 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

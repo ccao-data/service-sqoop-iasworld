@@ -191,7 +191,8 @@ CREATE TABLE `iasworld.cvleg`(
   `user57` varchar(80), 
   `user58` varchar(80), 
   `user59` varchar(80), 
-  `user60` varchar(80),
+  `user60` varchar(80), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -388,7 +389,8 @@ CREATE TABLE `iasworld.cvleg_bucketed`(
   `user57` varchar(80), 
   `user58` varchar(80), 
   `user59` varchar(80), 
-  `user60` varchar(80))
+  `user60` varchar(80), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) INTO 10 BUCKETS
 STORED AS PARQUET

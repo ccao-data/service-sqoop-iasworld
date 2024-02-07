@@ -185,7 +185,8 @@ CREATE TABLE `iasworld.sales`(
   `udate4` string, 
   `udate5` string, 
   `deed_ref` varchar(1), 
-  `timeadjvaldt2` string)
+  `timeadjvaldt2` string, 
+  `loaded_at` string)
 STORED AS RCFILE;
         
 CREATE TABLE `iasworld.sales_bucketed`(
@@ -375,7 +376,8 @@ CREATE TABLE `iasworld.sales_bucketed`(
   `udate4` string, 
   `udate5` string, 
   `deed_ref` varchar(1), 
-  `timeadjvaldt2` string)
+  `timeadjvaldt2` string, 
+  `loaded_at` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 30 BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

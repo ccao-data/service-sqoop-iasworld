@@ -10,6 +10,7 @@ CREATE TABLE `iasworld.dedit`(
   `who` varchar(50), 
   `wen` string, 
   `longdesc` varchar(200), 
-  `iasw_id` decimal(10,0))
+  `iasw_id` decimal(10,0), 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

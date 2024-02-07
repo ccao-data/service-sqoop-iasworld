@@ -38,7 +38,8 @@ CREATE TABLE `iasworld.htdates`(
   `udate2` string, 
   `udate3` string, 
   `udate4` string, 
-  `udate5` string)
+  `udate5` string, 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

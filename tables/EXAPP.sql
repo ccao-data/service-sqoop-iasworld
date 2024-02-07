@@ -416,7 +416,8 @@ CREATE TABLE `iasworld.exapp`(
   `udate13` string, 
   `udate14` string, 
   `udate15` string, 
-  `form` varchar(12),
+  `form` varchar(12), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -838,7 +839,8 @@ CREATE TABLE `iasworld.exapp_bucketed`(
   `udate13` string, 
   `udate14` string, 
   `udate15` string, 
-  `form` varchar(12))
+  `form` varchar(12), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

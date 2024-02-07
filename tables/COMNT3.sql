@@ -14,7 +14,8 @@ CREATE TABLE `iasworld.comnt3`(
   `upd_status` varchar(1), 
   `bldgno` varchar(10), 
   `unit` varchar(10), 
-  `comnt2` string)
+  `comnt2` string, 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

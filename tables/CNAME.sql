@@ -133,6 +133,7 @@ CREATE TABLE `iasworld.cname`(
   `addressguid` varchar(36), 
   `ssn2` varchar(9), 
   `cell_phone` varchar(25), 
-  `business_phone` varchar(25))
+  `business_phone` varchar(25), 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

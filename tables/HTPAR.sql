@@ -317,7 +317,8 @@ CREATE TABLE `iasworld.htpar`(
   `userval5` decimal(10,0), 
   `form` varchar(12), 
   `procname` varchar(10), 
-  `procdate` string,
+  `procdate` string, 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -640,7 +641,8 @@ CREATE TABLE `iasworld.htpar_bucketed`(
   `userval5` decimal(10,0), 
   `form` varchar(12), 
   `procname` varchar(10), 
-  `procdate` string)
+  `procdate` string, 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 15 BUCKETS
 STORED AS PARQUET

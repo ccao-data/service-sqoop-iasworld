@@ -155,7 +155,8 @@ CREATE TABLE `iasworld.cvown`(
   `udate9` string, 
   `udate10` string, 
   `skip_addr_validation` varchar(1), 
-  `user41` varchar(500),
+  `user41` varchar(500), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -316,7 +317,8 @@ CREATE TABLE `iasworld.cvown_bucketed`(
   `udate9` string, 
   `udate10` string, 
   `skip_addr_validation` varchar(1), 
-  `user41` varchar(500))
+  `user41` varchar(500), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

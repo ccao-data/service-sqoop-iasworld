@@ -319,7 +319,8 @@ CREATE TABLE `iasworld.asmt_hist`(
   `ovrval60` decimal(10,0), 
   `val60` decimal(10,0), 
   `splitno` decimal(15,0), 
-  `form` varchar(12),
+  `form` varchar(12), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -644,7 +645,8 @@ CREATE TABLE `iasworld.asmt_hist_bucketed`(
   `ovrval60` decimal(10,0), 
   `val60` decimal(10,0), 
   `splitno` decimal(15,0), 
-  `form` varchar(12))
+  `form` varchar(12), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 30 BUCKETS
 STORED AS PARQUET

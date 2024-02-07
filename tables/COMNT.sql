@@ -12,6 +12,7 @@ CREATE TABLE `iasworld.comnt`(
   `trans_id` decimal(10,0), 
   `upd_status` varchar(1), 
   `caseno` varchar(15), 
-  `comnt2` string)
+  `comnt2` string, 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

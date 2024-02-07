@@ -62,7 +62,8 @@ CREATE TABLE `iasworld.addrindx`(
   `xcoord` decimal(10,0), 
   `ycoord` decimal(10,0), 
   `strcd` varchar(10), 
-  `strreloc` varchar(150))
+  `strreloc` varchar(150), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

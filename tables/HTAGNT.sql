@@ -64,6 +64,7 @@ CREATE TABLE `iasworld.htagnt`(
   `name2_suffix` varchar(20), 
   `name2_companyname` varchar(205), 
   `agent_type` decimal(10,0), 
-  `iasw_id` decimal(10,0))
+  `iasw_id` decimal(10,0), 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');
