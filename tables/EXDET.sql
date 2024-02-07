@@ -199,7 +199,8 @@ CREATE TABLE `iasworld.exdet`(
   `yrbase` decimal(4,0), 
   `begdt` string, 
   `enddt` string, 
-  `form` varchar(12),
+  `form` varchar(12), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -404,7 +405,8 @@ CREATE TABLE `iasworld.exdet_bucketed`(
   `yrbase` decimal(4,0), 
   `begdt` string, 
   `enddt` string, 
-  `form` varchar(12))
+  `form` varchar(12), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

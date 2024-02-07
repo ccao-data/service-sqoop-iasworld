@@ -20,6 +20,7 @@ CREATE TABLE `iasworld.lpmod`(
   `acradjflg` varchar(1), 
   `iasw_id` decimal(10,0), 
   `soiltble` varchar(30), 
-  `schedtble` decimal(6,0))
+  `schedtble` decimal(6,0), 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

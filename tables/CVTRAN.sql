@@ -209,7 +209,8 @@ CREATE TABLE `iasworld.cvtran`(
   `userval17` decimal(10,0), 
   `userval18` decimal(10,0), 
   `userval19` decimal(10,0), 
-  `userval20` decimal(10,0),
+  `userval20` decimal(10,0), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -424,7 +425,8 @@ CREATE TABLE `iasworld.cvtran_bucketed`(
   `userval17` decimal(10,0), 
   `userval18` decimal(10,0), 
   `userval19` decimal(10,0), 
-  `userval20` decimal(10,0))
+  `userval20` decimal(10,0), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

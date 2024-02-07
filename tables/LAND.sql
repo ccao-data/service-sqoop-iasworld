@@ -162,7 +162,8 @@ CREATE TABLE `iasworld.land`(
   `udate5` string, 
   `landid` varchar(30), 
   `cerrate` decimal(5,2), 
-  `ovrnbhd` varchar(8),
+  `ovrnbhd` varchar(8), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -330,7 +331,8 @@ CREATE TABLE `iasworld.land_bucketed`(
   `udate5` string, 
   `landid` varchar(30), 
   `cerrate` decimal(5,2), 
-  `ovrnbhd` varchar(8))
+  `ovrnbhd` varchar(8), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

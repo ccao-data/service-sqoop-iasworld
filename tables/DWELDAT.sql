@@ -363,7 +363,8 @@ CREATE TABLE `iasworld.dweldat`(
   `external_propct` decimal(9,6), 
   `external_calc_rcnld` decimal(10,0), 
   `calc_meth` varchar(1), 
-  `note3` string,
+  `note3` string, 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -732,7 +733,8 @@ CREATE TABLE `iasworld.dweldat_bucketed`(
   `external_propct` decimal(9,6), 
   `external_calc_rcnld` decimal(10,0), 
   `calc_meth` varchar(1), 
-  `note3` string)
+  `note3` string, 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET

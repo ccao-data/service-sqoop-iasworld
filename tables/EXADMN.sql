@@ -216,7 +216,8 @@ CREATE TABLE `iasworld.exadmn`(
   `userval7` decimal(10,0), 
   `userval8` decimal(10,0), 
   `userval9` decimal(10,0), 
-  `userval10` decimal(10,0))
+  `userval10` decimal(10,0), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

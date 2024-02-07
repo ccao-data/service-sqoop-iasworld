@@ -143,7 +143,8 @@ CREATE TABLE `iasworld.owndat`(
   `skip_addr_validation` varchar(1), 
   `user41` varchar(500), 
   `cell_phone` varchar(25), 
-  `business_phone` varchar(25),
+  `business_phone` varchar(25), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -292,7 +293,8 @@ CREATE TABLE `iasworld.owndat_bucketed`(
   `skip_addr_validation` varchar(1), 
   `user41` varchar(500), 
   `cell_phone` varchar(25), 
-  `business_phone` varchar(25))
+  `business_phone` varchar(25), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

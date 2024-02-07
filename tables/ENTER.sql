@@ -20,6 +20,7 @@ CREATE TABLE `iasworld.enter`(
   `upd_status` varchar(1), 
   `seq` decimal(3,0), 
   `cur` varchar(1), 
-  `deactivat` string)
+  `deactivat` string, 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

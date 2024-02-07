@@ -119,7 +119,8 @@ CREATE TABLE `iasworld.splcom`(
   `user21` varchar(250), 
   `user22` varchar(250), 
   `user23` varchar(250), 
-  `user24` varchar(250))
+  `user24` varchar(250), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

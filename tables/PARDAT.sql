@@ -236,7 +236,8 @@ CREATE TABLE `iasworld.pardat`(
   `userval13` decimal(10,0), 
   `userval14` decimal(10,0), 
   `userval15` decimal(10,0), 
-  `ts_unit_count` decimal(10,0),
+  `ts_unit_count` decimal(10,0), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -478,7 +479,8 @@ CREATE TABLE `iasworld.pardat_bucketed`(
   `userval13` decimal(10,0), 
   `userval14` decimal(10,0), 
   `userval15` decimal(10,0), 
-  `ts_unit_count` decimal(10,0))
+  `ts_unit_count` decimal(10,0), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 20 BUCKETS
 STORED AS PARQUET

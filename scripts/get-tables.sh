@@ -28,7 +28,7 @@ for TABLE in ${JOB_TABLES}; do
         --connect jdbc:oracle:thin:@//"$IPTS_HOSTNAME":"$IPTS_PORT"/"$IPTS_SERVICE_NAME" \
         --username "$IPTS_USERNAME" \
         --password-file file:///run/secrets/IPTS_PASSWORD \
-        --query "SELECT * FROM IASWORLD.${TABLE} WHERE \$CONDITIONS FETCH FIRST 1 ROWS ONLY" \
+        --query "SELECT t.*, SYS_EXTRACT_UTC(CURRENT_TIMESTAMP) AS loaded_at FROM IASWORLD.${TABLE} t WHERE \$CONDITIONS FETCH FIRST 1 ROWS ONLY" \
         --hcatalog-database "$DB_NAME" \
         --hcatalog-table "$TABLE" \
         --drop-and-create-hcatalog-table \

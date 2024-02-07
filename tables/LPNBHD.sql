@@ -65,6 +65,7 @@ CREATE TABLE `iasworld.lpnbhd`(
   `iasw_id` decimal(10,0), 
   `revmeth` varchar(1), 
   `landpct` decimal(10,0), 
-  `modelid` decimal(10,0))
+  `modelid` decimal(10,0), 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

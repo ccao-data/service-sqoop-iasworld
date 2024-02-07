@@ -77,6 +77,7 @@ CREATE TABLE `iasworld.permit`(
   `user43` varchar(260), 
   `addrvalid` varchar(1), 
   `notes` string, 
-  `longdesc` varchar(2000))
+  `longdesc` varchar(2000), 
+  `loaded_at` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');

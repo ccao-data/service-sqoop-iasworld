@@ -80,7 +80,8 @@ CREATE TABLE `iasworld.addn`(
   `eff_area` decimal(10,0), 
   `effageovr` decimal(4,0), 
   `stories` decimal(10,0), 
-  `footprint` decimal(10,0),
+  `footprint` decimal(10,0), 
+  `loaded_at` string,
   `taxyr` string)
 STORED AS RCFILE;
         
@@ -166,7 +167,8 @@ CREATE TABLE `iasworld.addn_bucketed`(
   `eff_area` decimal(10,0), 
   `effageovr` decimal(4,0), 
   `stories` decimal(10,0), 
-  `footprint` decimal(10,0))
+  `footprint` decimal(10,0), 
+  `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 CLUSTERED BY (`parid`) SORTED BY (`seq`) INTO 10 BUCKETS
 STORED AS PARQUET
