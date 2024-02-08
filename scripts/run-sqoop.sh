@@ -44,8 +44,8 @@ for TABLE in ${JOB_TABLES}; do
         NUM_MAPPERS=$(($(date +%Y) - 1998))
         NUM_MAPPERS=$((NUM_MAPPERS < MAX_MAPPERS ? NUM_MAPPERS : MAX_MAPPERS))
         BOUNDARY_QUERY="SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}"
-        QUERY="SELECT table.*, SYS_EXTRACT_UTC(CURRENT_TIMESTAMP) AS loaded_at
-               FROM IASWORLD.${TABLE} table
+        QUERY="SELECT t.*, SYS_EXTRACT_UTC(CURRENT_TIMESTAMP) AS loaded_at
+               FROM IASWORLD.${TABLE} t
                WHERE \$CONDITIONS"
     else
         # Make number of mappers roughly equal to number of tax years
@@ -59,8 +59,8 @@ for TABLE in ${JOB_TABLES}; do
         NUM_MAPPERS=$((NUM_MAPPERS < MAX_MAPPERS ? NUM_MAPPERS : MAX_MAPPERS))
         BOUNDARY_QUERY="SELECT MIN(TAXYR), MAX(TAXYR) FROM IASWORLD.${TABLE}
                         WHERE TAXYR ${QUERY_COND} ${QUERY_YEAR}"
-        QUERY="SELECT table.*, SYS_EXTRACT_UTC(CURRENT_TIMESTAMP) AS loaded_at
-               FROM IASWORLD.${TABLE} table
+        QUERY="SELECT t.*, SYS_EXTRACT_UTC(CURRENT_TIMESTAMP) AS loaded_at
+               FROM IASWORLD.${TABLE} t
                WHERE TAXYR ${QUERY_COND} ${QUERY_YEAR}
                AND \$CONDITIONS"
     fi
