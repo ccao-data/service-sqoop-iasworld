@@ -1,5 +1,5 @@
 #!/bin/bash
-MAX_MAPPERS=16
+MAX_MAPPERS=32
 
 # Check if table env var exists from docker, if not, use all tables
 if [[ -z "$IPTS_TABLE" ]]; then
