@@ -3,7 +3,7 @@
 ##### CREATE MAIN HADOOP IMAGE #####
 
 # Fresh base image 
-FROM centos:7
+FROM centos:7 AS hadoop
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 # Development tools
@@ -32,7 +32,7 @@ ENV HADOOP_MAPRED_HOME "$HADOOP_HOME"
 ENV HADOOP_YARN_HOME "$HADOOP_HOME"
 ENV HADOOP_CONF_DIR "$HADOOP_HOME"/etc/hadoop
 ENV PATH "$PATH":"$HADOOP_HOME"/bin
-RUN curl -sk https://archive.apache.org/dist/hadoop/common/hadoop-"$HADOOP_VER"/hadoop-"$HADOOP_VER".tar.gz \
+RUN curl -s https://archive.apache.org/dist/hadoop/common/hadoop-"$HADOOP_VER"/hadoop-"$HADOOP_VER".tar.gz \
     | tar -xz -C /usr/local/ && \
     cd /usr/local && \
     ln -s ./hadoop-"$HADOOP_VER" hadoop && \
@@ -78,6 +78,10 @@ RUN chown -R root:root /etc/docker-config/ && \
 
 
 ##### CREATE MAIN SQOOP IMAGE #####
+
+# Use hadoop image as base 
+FROM hadoop AS sqoop
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 # Sqoop
 ARG SQOOP_VER=1.4.7
