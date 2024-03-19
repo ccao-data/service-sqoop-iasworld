@@ -3,7 +3,7 @@
 ##### CREATE MAIN HADOOP IMAGE #####
 
 # Fresh base image 
-FROM centos:7 AS hadoop
+FROM centos:7
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 # Development tools
@@ -78,9 +78,6 @@ RUN chown -R root:root /etc/docker-config/ && \
 
 
 ##### CREATE MAIN SQOOP IMAGE #####
-
-# Use hadoop image as base 
-FROM hadoop AS sqoop
 
 # Sqoop
 ARG SQOOP_VER=1.4.7
