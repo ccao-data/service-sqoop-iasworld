@@ -32,7 +32,7 @@ ENV HADOOP_MAPRED_HOME "$HADOOP_HOME"
 ENV HADOOP_YARN_HOME "$HADOOP_HOME"
 ENV HADOOP_CONF_DIR "$HADOOP_HOME"/etc/hadoop
 ENV PATH "$PATH":"$HADOOP_HOME"/bin
-RUN curl -sk https://archive.apache.org/dist/hadoop/common/hadoop-"$HADOOP_VER"/hadoop-"$HADOOP_VER".tar.gz \
+RUN curl -s https://archive.apache.org/dist/hadoop/common/hadoop-"$HADOOP_VER"/hadoop-"$HADOOP_VER".tar.gz \
     | tar -xz -C /usr/local/ && \
     cd /usr/local && \
     ln -s ./hadoop-"$HADOOP_VER" hadoop && \
@@ -88,7 +88,7 @@ ARG SQOOP_HADOOP_VER=2.6.0
 ENV SQOOP_HOME /usr/local/sqoop
 ENV SQOOP_CONF_DIR "$SQOOP_HOME"/conf
 ENV PATH "$PATH":"$HADOOP_HOME"/bin:"$SQOOP_HOME"/bin
-RUN curl -s http://archive.apache.org/dist/sqoop/"$SQOOP_VER"/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER".tar.gz \
+RUN curl -s https://archive.apache.org/dist/sqoop/"$SQOOP_VER"/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER".tar.gz \
     | tar -xz -C /usr/local && \
     ln -s /usr/local/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER" "$SQOOP_HOME"
 
