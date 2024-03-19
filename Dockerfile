@@ -81,7 +81,6 @@ RUN chown -R root:root /etc/docker-config/ && \
 
 # Use hadoop image as base 
 FROM hadoop AS sqoop
-SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 # Sqoop
 ARG SQOOP_VER=1.4.7
@@ -89,7 +88,7 @@ ARG SQOOP_HADOOP_VER=2.6.0
 ENV SQOOP_HOME /usr/local/sqoop
 ENV SQOOP_CONF_DIR "$SQOOP_HOME"/conf
 ENV PATH "$PATH":"$HADOOP_HOME"/bin:"$SQOOP_HOME"/bin
-RUN curl -s http://archive.apache.org/dist/sqoop/"$SQOOP_VER"/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER".tar.gz \
+RUN curl -s https://archive.apache.org/dist/sqoop/"$SQOOP_VER"/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER".tar.gz \
     | tar -xz -C /usr/local && \
     ln -s /usr/local/sqoop-"$SQOOP_VER".bin__hadoop-"$SQOOP_HADOOP_VER" "$SQOOP_HOME"
 
