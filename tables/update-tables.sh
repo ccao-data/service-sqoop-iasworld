@@ -25,9 +25,8 @@ for TABLE in ${TABLES}; do
             | tr -d "\n" | tr -d "\r"
     )
 
-    # Remove properties, scale/precision, and options added by Sqoop
-    # Also remove taxyr col (it is re-added manually). See Hive data types
-    # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
+    # Remove properties and options added by Sqoop and remove taxyr col (it
+    # will be readded manually)
     sed '/ROW FORMAT SERDE/Q' "$TABLE".sql \
         | sed "/\`taxyr\` decimal(4,0)/d" \
             > "$TABLE".sql.tmp1
