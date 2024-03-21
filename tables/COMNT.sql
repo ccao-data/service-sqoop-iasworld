@@ -1,18 +1,18 @@
 CREATE TABLE `iasworld.comnt`(
-  `jur` varchar,
-  `parid` varchar,
-  `comntno` decimal,
-  `code` varchar,
-  `comntstat` varchar,
-  `comnt` varchar,
-  `who` varchar,
+  `jur` string,
+  `parid` string,
+  `comntno` numeric,
+  `code` string,
+  `comntstat` string,
+  `comnt` string,
+  `who` string,
   `wen` string,
-  `status` varchar,
-  `iasw_id` decimal,
-  `trans_id` decimal,
-  `upd_status` varchar,
-  `caseno` varchar,
+  `status` string,
+  `iasw_id` numeric,
+  `trans_id` numeric,
+  `upd_status` string,
+  `caseno` string,
   `comnt2` string,
   `loaded_at` string)
 STORED AS PARQUET
-TBLPROPERTIES ('parquet.compression'='ZSTD');
+TBLPROPERTIES ('parquet.compression'='SNAPPY');

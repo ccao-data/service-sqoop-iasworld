@@ -26,10 +26,13 @@ for TABLE in ${TABLES}; do
     )
 
     # Remove properties, scale/precision, and options added by Sqoop
-    # Also remove taxyr col (it is re-added manually)
+    # Also remove taxyr col (it is re-added manually). See Hive data types
+    # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
     sed '/ROW FORMAT SERDE/Q' "$TABLE".sql \
         | sed "/\`taxyr\` decimal(4,0)/d" \
         | sed "s/\(([,0-9]*\))//" \
+        | sed "s/varchar,/string,/" \
+        | sed "s/decimal,/numeric,/" \
             > "$TABLE".sql.tmp1
 
     # For TAXYR and BUCKETS, create an unpartitioned, unbucketed table
@@ -43,7 +46,7 @@ for TABLE in ${TABLES}; do
         echo "PARTITIONED BY (\`taxyr\` string)
 CLUSTERED BY (\`parid\`) SORTED BY (\`cur\`) INTO ${NUM_BUCKETS} BUCKETS
 STORED AS PARQUET
-TBLPROPERTIES ('parquet.compression'='ZSTD');" \
+TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \
                 >> "$TABLE".sql.tmp2
 
@@ -63,7 +66,7 @@ STORED AS RCFILE;
         sed '/taxyr/d' "$TABLE".sql.tmp1 > "$TABLE".sql.tmp2
         echo "PARTITIONED BY (\`taxyr\` string)
 STORED AS PARQUET
-TBLPROPERTIES ('parquet.compression'='ZSTD');" \
+TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \
                 >> "$TABLE".sql.tmp2
 
@@ -76,7 +79,7 @@ TBLPROPERTIES ('parquet.compression'='ZSTD');" \
         sed -i "s/${TABLE_LC}/${TABLE_LC}\_bucketed/g" "$TABLE".sql.tmp2
         echo "CLUSTERED BY (\`parid\`) SORTED BY (\`cur\`) INTO ${NUM_BUCKETS} BUCKETS
 STORED AS PARQUET
-TBLPROPERTIES ('parquet.compression'='ZSTD');" \
+TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \
                 >> "$TABLE".sql.tmp2
 
@@ -86,7 +89,7 @@ TBLPROPERTIES ('parquet.compression'='ZSTD');" \
     else
 
         echo "STORED AS PARQUET
-TBLPROPERTIES ('parquet.compression'='ZSTD');" >> "$TABLE".sql.tmp1
+TBLPROPERTIES ('parquet.compression'='SNAPPY');" >> "$TABLE".sql.tmp1
         mv "$TABLE".sql.tmp1 "$TABLE".sql
 
     fi

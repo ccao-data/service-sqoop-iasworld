@@ -1,21 +1,21 @@
 CREATE TABLE `iasworld.comnt3`(
-  `jur` varchar,
-  `parid` varchar,
-  `comntno` decimal,
-  `fileyr` decimal,
-  `linkid` decimal,
-  `code` varchar,
-  `comnt` varchar,
-  `who` varchar,
+  `jur` string,
+  `parid` string,
+  `comntno` numeric,
+  `fileyr` numeric,
+  `linkid` numeric,
+  `code` string,
+  `comnt` string,
+  `who` string,
   `wen` string,
-  `status` varchar,
-  `iasw_id` decimal,
-  `trans_id` decimal,
-  `upd_status` varchar,
-  `bldgno` varchar,
-  `unit` varchar,
+  `status` string,
+  `iasw_id` numeric,
+  `trans_id` numeric,
+  `upd_status` string,
+  `bldgno` string,
+  `unit` string,
   `comnt2` string,
   `loaded_at` string)
 PARTITIONED BY (`taxyr` string)
 STORED AS PARQUET
-TBLPROPERTIES ('parquet.compression'='ZSTD');
+TBLPROPERTIES ('parquet.compression'='SNAPPY');

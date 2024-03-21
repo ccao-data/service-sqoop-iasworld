@@ -1,16 +1,16 @@
 CREATE TABLE `iasworld.dedit`(
-  `tbl1` varchar,
-  `tbl2` varchar,
-  `fld1` varchar,
-  `fld2` varchar,
-  `val1` varchar,
-  `val2` varchar,
-  `msg` varchar,
-  `shortdesc` varchar,
-  `who` varchar,
+  `tbl1` string,
+  `tbl2` string,
+  `fld1` string,
+  `fld2` string,
+  `val1` string,
+  `val2` string,
+  `msg` string,
+  `shortdesc` string,
+  `who` string,
   `wen` string,
-  `longdesc` varchar,
-  `iasw_id` decimal,
+  `longdesc` string,
+  `iasw_id` numeric,
   `loaded_at` string)
 STORED AS PARQUET
-TBLPROPERTIES ('parquet.compression'='ZSTD');
+TBLPROPERTIES ('parquet.compression'='SNAPPY');
