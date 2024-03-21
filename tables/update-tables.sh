@@ -30,10 +30,12 @@ for TABLE in ${TABLES}; do
     # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
     sed '/ROW FORMAT SERDE/Q' "$TABLE".sql \
         | sed "/\`taxyr\` decimal(4,0)/d" \
-        | sed "s/\(([,0-9]*\))//" \
-        | sed "s/varchar,/string,/" \
-        | sed "s/decimal,/numeric,/" \
             > "$TABLE".sql.tmp1
+
+    # Manually update some columns with corrected data types
+    for coord in xcoord ycoord zcoord; do
+        sed -i "s/\`$coord\` decimal(10,0)/\`$coord\` decimal(15,8)/" "$TABLE".sql.tmp1
+    done
 
     # For TAXYR and BUCKETS, create an unpartitioned, unbucketed table
     # as a temporary place for sqoop to extract to, and a partitioned,
