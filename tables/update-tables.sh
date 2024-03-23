@@ -31,6 +31,11 @@ for TABLE in ${TABLES}; do
         | sed "/\`taxyr\` decimal(4,0)/d" \
             > "$TABLE".sql.tmp1
 
+    # Manually update some columns with corrected data types
+    for coord in xcoord ycoord zcoord; do
+        sed -i "s/\`$coord\` decimal(10,0)/\`$coord\` decimal(15,8)/" "$TABLE".sql.tmp1
+    done
+
     # For TAXYR and BUCKETS, create an unpartitioned, unbucketed table
     # as a temporary place for sqoop to extract to, and a partitioned,
     # bucketed table as a final location
@@ -40,7 +45,7 @@ for TABLE in ${TABLES}; do
         cp "$TABLE".sql.tmp1 "$TABLE".sql.tmp2
         sed -i "/^CREATE TABLE/s/${TABLE_LC}/${TABLE_LC}\_bucketed/" "$TABLE".sql.tmp2
         echo "PARTITIONED BY (\`taxyr\` string)
-CLUSTERED BY (\`parid\`) SORTED BY (\`seq\`) INTO ${NUM_BUCKETS} BUCKETS
+CLUSTERED BY (\`parid\`) SORTED BY (\`cur\`) INTO ${NUM_BUCKETS} BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \
@@ -73,7 +78,7 @@ TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
 
         cp "$TABLE".sql.tmp1 "$TABLE".sql.tmp2
         sed -i "s/${TABLE_LC}/${TABLE_LC}\_bucketed/g" "$TABLE".sql.tmp2
-        echo "CLUSTERED BY (\`parid\`) SORTED BY (\`seq\`) INTO ${NUM_BUCKETS} BUCKETS
+        echo "CLUSTERED BY (\`parid\`) SORTED BY (\`cur\`) INTO ${NUM_BUCKETS} BUCKETS
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
             | tr -s ' ' \
@@ -90,12 +95,15 @@ TBLPROPERTIES ('parquet.compression'='SNAPPY');" >> "$TABLE".sql.tmp1
 
     fi
 
-    # Delete bucketing sort of CV table (no seq number)
+    # Delete bucketing sort of CV table (no cur)
     if [[ "$TABLE" == CVLEG ]]; then
-        sed -i "s/SORTED BY (\`seq\`) //" "$TABLE".sql
+        sed -i "s/SORTED BY (\`cur\`) //" "$TABLE".sql
     elif [[ "$TABLE" == CVOWN || "$TABLE" == CVTRAN ]]; then
         sed -i "/^CLUSTERED BY/d" "$TABLE".sql
     fi
+
+    # Trim any trailing whitespace
+    sed -i "s/[ \t]*$//" "$TABLE".sql
 
     rm -f ./*.tmp*
 
