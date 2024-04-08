@@ -1,10 +1,16 @@
 #!/bin/bash
 # Script to convert table definitions created by Sqoop into
 # bucketed, partitioned tables saved as parquet
-TABLES=$(awk -F"," 'NR>1 {print $1}' tables-list.csv)
+
+# Check if table env var exists, if not, use all tables
+if [[ -z "$IPTS_TABLE" ]]; then
+    JOB_TABLES=$(awk -F"," 'NR>1 {print $1}' /tmp/tables/tables-list.csv)
+else
+    JOB_TABLES="$IPTS_TABLE"
+fi
 
 # Loop through each file and convert
-for TABLE in ${TABLES}; do
+for TABLE in ${JOB_TABLES}; do
     TABLE_LC=$(echo "$TABLE" | awk '{print tolower($0)}')
 
     # Boolean value for whether $TABLE contains the TAXYR column
@@ -64,7 +70,7 @@ STORED AS RCFILE;
     # long as there are no buckets)
     elif [[ "$CONTAINS_TAXYR" == TRUE && ! "$NUM_BUCKETS" -gt 1 ]]; then
 
-        sed '/taxyr/d' "$TABLE".sql.tmp1 > "$TABLE".sql.tmp2
+        sed '/\`taxyr\`/d' "$TABLE".sql.tmp1 > "$TABLE".sql.tmp2
         echo "PARTITIONED BY (\`taxyr\` string)
 STORED AS PARQUET
 TBLPROPERTIES ('parquet.compression'='SNAPPY');" \
