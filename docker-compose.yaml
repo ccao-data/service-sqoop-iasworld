@@ -1,17 +1,18 @@
-version: '3.6'
+version: '3.9'
 
 x-default: &node
-  build:
-    context: .
-    dockerfile: Dockerfile
-  image: ${CCAO_REGISTRY_URL}/service-sqoop-iasworld:latest
+  image: bitnami/spark:3.5.1
   volumes:
     - ./drivers:/jdbc
     - ./scripts:/tmp/scripts
     - ./tables:/tmp/tables
     - ./target:/tmp/target
   environment:
-    - MASTER_HOSTNAME=sqoop-node-master
+    - SPARK_RPC_AUTHENTICATION_ENABLED=no
+    - SPARK_RPC_ENCRYPTION_ENABLED=no
+    - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+    - SPARK_SSL_ENABLED=no
+    - SPARK_USER=spark
     - IPTS_HOSTNAME
     - IPTS_PORT
     - IPTS_SERVICE_NAME
@@ -20,54 +21,35 @@ x-default: &node
   secrets:
     - IPTS_PASSWORD
   networks:
-    - hadoopnet
+    - sparknet
 
 services:
-  sqoop-node-master:
+  spark-node-master:
     <<: *node
-    container_name: sqoop-node-master
-    hostname: sqoop-node-master
-    ports:
-      - 9870:9870
-      - 9864:9864
-      - 8081:8080
-      - 8082:8088
-      - 8042:8042
-    command: >
-      /bin/bash -c "/tmp/scripts/wait-for-it.sh hive-metastore-server:9083 --
-                    /tmp/scripts/run-sqoop.sh"
-
-  hive-metastore-postgresql:
-    container_name: hive-metastore-postgresql
-    hostname: hive-metastore-postgresql
-    image: postgres:9.5.3
-    volumes:
-      - ./docker-config/hive/:/docker-entrypoint-initdb.d/
-    networks:
-      - hadoopnet
-    depends_on:
-      - sqoop-node-master
-
-  hive-metastore-server:
-    <<: *node
-    container_name: hive-metastore-server
-    hostname: hive-metastore-server
-    depends_on:
-      - sqoop-node-master
+    container_name: spark-node-master
+    hostname: spark-node-master
     environment:
-      - MASTER_HOSTNAME=sqoop-node-master
-      - SKIP_BOOTSTRAP=1
-    command: >
-      /bin/bash -c "/tmp/scripts/wait-for-it.sh hive-metastore-postgresql:5432 --
-                    schematool -initSchema -dbType postgres
-                    hive --service metastore"
+      - SPARK_MODE=master
+    ports:
+      - 8080:8080
+      - 7077:7077
+
+  spark-node-worker1:
+    <<: *node
+    container_name: spark-node-worker1
+    hostname: spark-node-worker1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-node-master:7077
+      - SPARK_WORKER_MEMORY=64G
+      - SPARK_WORKER_CORES=32
 
 networks:
-  hadoopnet:
+  sparknet:
     ipam:
       config:
         - subnet: 211.54.0.0/16
-    name: hadoopnet
+    name: sparknet
 
 secrets:
   IPTS_PASSWORD:
