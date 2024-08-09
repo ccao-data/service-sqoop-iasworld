@@ -27,6 +27,7 @@ def read_predicates_from_csv(file_path):
     predicates = []
     with open(file_path, mode='r') as file:
         csv_reader = csv.reader(file)
+        next(csv_reader)
         for row in csv_reader:
             start, end, _ = row
             predicate = f"parid >= '{start}' AND parid <= '{end}'"
@@ -51,13 +52,14 @@ print(predicates)
 
 df = spark.read.jdbc(
         url=database_url,
-        table="iasworld.asmt_all",
+        table="iasworld.addn",
         properties={"user": IPTS_USERNAME, "password": IPTS_PASSWORD, "fetchsize": "10000"},
         predicates=predicates
     )
 
-df.filter("taxyr == 2023") \
-    .repartition("taxyr", "cur") \
+df.filter("taxyr >= 2023") \
+    .repartition(20) \
     .write \
     .option("compression", "zstd") \
+    .partitionBy("taxyr", "cur") \
     .parquet("/tmp/target/test.parquet")

@@ -62,7 +62,7 @@ networks:
   sparknet:
     ipam:
       config:
-        - subnet: 211.54.0.0/16
+        - subnet: 211.55.0.0/16
     name: sparknet
 
 secrets:
