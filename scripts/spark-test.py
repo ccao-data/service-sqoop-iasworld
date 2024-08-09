@@ -17,8 +17,8 @@ spark = (
     .config("spark.jars", driver_path)
     .config("spark.driver.extraClassPath", driver_path)
     .config("spark.executor.extraClassPath", driver_path)
-    .config("spark.driver.memory", "4g")  # Set driver memory
-    .config("spark.executor.memory", "80g")  # Set executor memory
+    .config("spark.driver.memory", "2g")  # Set driver memory
+    .config("spark.executor.memory", "96g")  # Set executor memory
     .getOrCreate()
 )
 
